@@ -34,34 +34,7 @@ identical for all sender-local methods. Receiver-only addresses are reported as
 uncovered rather than automatically labelled cross-region. Static coverage is
 53.8% (D1), 56.6% (D2), 60.6% (D3), and 45.7% (C1).
 
-## Main files
 
-```text
-data/*.csv                 measured traces
-data/*.manifest.json       collection provenance and hashes
-sim/partition.py           baselines, ALPS, TxAllo hook, and metrics
-sim/metis.py               optional sender-local weighted METIS baseline
-sim/experiment.py          sequential and retry-aware barrier execution
-sim/online.py              chronological sender-pinning allocation
-sim/native.py              direct-call adapter with measured nonce order
-sim/ethereum.py            Transfer-event adapter (no real signer nonce)
-tests/test_validity.py      invariant, retry, temporal, and metric tests
-run_all_traces.py           complete cross-trace evidence battery
-run_headtohead.py           three-seed TxAllo allocation comparison
-run_txallo_sensitivity.py   six-region eta/sweep-cap audit
-run_allocator_scaling.py    real-prefix ALPS time/memory scaling
-run_alpha_sensitivity.py    five-seed hard-cap sensitivity audit
-run_allocator_comparison.py fresh-process baseline runtime comparison
-make_figures.py             publication figures (vector PDF + inspection PNG)
-ALPS_conference_submission/main.tex
-                            IEEE conference manuscript
-ALPS_conference_submission/references.bib
-                            focused 21-entry bibliography
-ALPS_conference_submission/figures/*.pdf
-                            four publication figures
-ALPS_conference_submission/alps_conference_paper_clean.pdf
-                            verified final manuscript
-```
 
 ## Reproduce the manuscript evidence
 
