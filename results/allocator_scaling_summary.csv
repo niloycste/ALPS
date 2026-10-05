@@ -1,0 +1,5 @@
+transactions,active_senders,active_edges,median_profile_seconds,median_allocation_seconds,median_total_seconds,max_peak_working_set_mib,max_load,capacity_relaxed_runs,seeds,cpu,python
+5000,3165,1801,0.020146,2.482632,2.502778,227.234,1.1076,0,3,Intel(R) Core(TM) i9-14900,3.12.13
+10000,6035,4131,0.033995,5.283941,5.324968,231.129,1.1304,0,3,Intel(R) Core(TM) i9-14900,3.12.13
+20000,11328,9070,0.074394,8.002358,8.076752,238.684,1.1499,0,3,Intel(R) Core(TM) i9-14900,3.12.13
+34326,18747,16120,0.046156,12.55544,12.600643,248.434,1.149974,0,3,Intel(R) Core(TM) i9-14900,3.12.13

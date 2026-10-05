@@ -1,0 +1,25 @@
+{
+  "chain": "Ethereum mainnet",
+  "chain_id": 1,
+  "csv_sha256": "bc37c9f406df236df9bb5f4ee8e38927de7d002f7a24c5a422906c6d9748e0e5",
+  "first_block_utc": "2026-08-13T06:30:35+00:00",
+  "last_block_utc": "2026-08-13T08:53:23+00:00",
+  "requested_blocks": 714,
+  "requested_first_block": 25744312,
+  "requested_last_block": 25745025,
+  "retrieved_utc": "2026-08-14T16:07:31.218761+00:00",
+  "rows": 39425,
+  "rpc": "https://ethereum-rpc.publicnode.com",
+  "scanned_blocks": 714,
+  "selection": "nonzero direct ERC-20 transfer(address,uint256) calls; self-transfers excluded",
+  "token_contracts": {
+    "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": "UNI",
+    "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": "WBTC",
+    "0x514910771af9ca656af840dff83e8264ecf986ca": "LINK",
+    "0x6b175474e89094c44da98b954eedeac495271d0f": "DAI",
+    "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce": "SHIB",
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "USDC",
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": "WETH",
+    "0xdac17f958d2ee523a2206206994597c13d831ec7": "USDT"
+  }
+}

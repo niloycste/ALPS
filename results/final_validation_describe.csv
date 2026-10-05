@@ -1,0 +1,2 @@
+trace,transactions,nonempty_blocks,first_block,last_block,height_span,accounts,categories,senders,repeat_senders,multi_category_senders,multi_category_tx_frac,max_sender_tx
+native-day2,39425,713,25744312,25745025,714,31642,8,20719,3108,578,0.20895370957514267,2853

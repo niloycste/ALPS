@@ -1,0 +1,11 @@
+trace,strategy,n_regions,split_senders,exposed_tx_frac,split_resources,resource_exposed_tx_frac,commit_global,global_rounds,tx_per_round,deferred_attempts,pending,commit_regional,seq_commit,conflicting_accounts,overdrawn_accounts,phantom_value,purity,r90,load,cross_region,interaction_coverage
+native-day2,ADDR-MOD,6,0,0.0,0,0.0,1.0,37,1065.54,0,0,0.9019,1.0,0,0,0.0,0.7001,5.875,1.386,0.8407,0.5662
+native-day2,TX-KMEANS,6,1348,0.4224,1061,0.3835,1.0,1388,28.4,2445926,0,0.8894,1.0,663,20,3116.21,0.9888,1.375,2.278,0.432,0.5662
+native-day2,SENDER-KMEANS,6,0,0.0,0,0.0,1.0,63,625.79,0,0,0.8943,1.0,0,0,0.0,0.9325,2.25,2.38,0.5749,0.5662
+native-day2,SENDER-KMEANS-BAL,6,0,0.0,0,0.0,1.0,31,1271.77,0,0,0.9016,1.0,0,0,0.0,0.9325,2.375,1.15,0.6697,0.5662
+native-day2,ALPS,6,0,0.0,0,0.0,1.0,31,1271.77,0,0,0.9053,1.0,0,0,0.0,0.9368,2.875,1.15,0.2789,0.5662
+native-day2,ADDR-MOD,11,0,0.0,0,0.0,1.0,26,1516.35,0,0,0.8958,1.0,0,0,0.0,0.7001,9.25,1.757,0.9059,0.5662
+native-day2,TX-KMEANS,11,1592,0.4436,1334,0.4081,1.0,1760,22.4,3126545,0,0.8927,1.0,935,28,5287.29,0.9975,1.625,3.258,0.4883,0.5662
+native-day2,SENDER-KMEANS,11,0,0.0,0,0.0,1.0,60,657.08,0,0,0.896,1.0,0,0,0.0,0.9406,3.375,4.173,0.6185,0.5662
+native-day2,SENDER-KMEANS-BAL,11,0,0.0,0,0.0,1.0,17,2319.12,0,0,0.8978,1.0,0,0,0.0,0.8858,5.25,1.15,0.7799,0.5662
+native-day2,ALPS,11,0,0.0,0,0.0,1.0,17,2319.12,0,0,0.902,1.0,0,0,0.0,0.9364,3.875,1.146,0.3245,0.5662

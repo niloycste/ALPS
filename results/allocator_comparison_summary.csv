@@ -1,0 +1,25 @@
+trace,transactions,n_regions,method,runs,median_total_seconds,std_total_seconds,median_peak_working_set_mib,mean_r90,mean_cross_region,max_load,cpu,python
+eth_aug14,34326,6,ADDR-MOD,5,0.001292,0.002301,225.836,5.875,0.836935,1.425275,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug14,34326,6,TX-KMEANS,5,0.158942,0.035466,231.191,1.375,0.424782,2.275826,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug14,34326,6,SENDER-KMEANS-BAL,5,0.681837,0.17043,228.848,2.55,0.65876,1.149974,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug14,34326,6,METIS-SENDER,5,0.218436,0.034928,230.027,4.7,0.082892,1.0,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug14,34326,6,TXALLO,5,4.363701,0.167422,291.332,4.95,0.122112,1.026394,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug14,34326,6,ALPS,5,12.902668,0.378885,247.762,3.05,0.264056,1.149974,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug13,39425,6,ADDR-MOD,5,0.002121,0.001565,241.996,5.875,0.84074,1.385517,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug13,39425,6,TX-KMEANS,5,0.209639,0.03125,246.801,1.375,0.432013,2.324515,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug13,39425,6,SENDER-KMEANS-BAL,5,0.499793,0.074699,244.586,2.325,0.668712,1.14993,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug13,39425,6,METIS-SENDER,5,0.244723,0.062637,245.477,4.575,0.09087,1.000025,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug13,39425,6,TXALLO,5,5.779546,0.518644,308.48,5.025,0.124854,1.013114,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug13,39425,6,ALPS,5,14.48113,0.737518,267.164,2.975,0.23911,1.14993,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug07,45893,6,ADDR-MOD,5,0.001702,0.001058,255.113,5.5,0.833507,1.217179,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug07,45893,6,TX-KMEANS,5,0.262792,0.062849,260.617,1.375,0.614151,2.081494,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug07,45893,6,SENDER-KMEANS-BAL,5,0.658203,0.147711,260.641,3.35,0.815725,1.149979,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug07,45893,6,METIS-SENDER,5,0.284338,0.061674,259.938,4.95,0.24481,1.000937,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug07,45893,6,TXALLO,5,6.884373,0.388238,335.41,4.725,0.156714,1.106835,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+eth_aug07,45893,6,ALPS,5,15.736769,0.629291,292.594,2.875,0.521884,1.149979,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+bsc,25728,6,ADDR-MOD,5,0.000981,0.000398,218.32,4.625,0.837063,1.214319,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+bsc,25728,6,TX-KMEANS,5,0.170265,0.032921,221.734,1.25,0.411844,2.953825,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+bsc,25728,6,SENDER-KMEANS-BAL,5,0.293135,0.155407,219.332,2.625,0.858845,1.149953,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+bsc,25728,6,METIS-SENDER,5,0.125161,0.022652,220.645,3.875,0.150498,1.0,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+bsc,25728,6,TXALLO,5,4.174009,0.665373,274.168,3.775,0.197294,1.020056,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13
+bsc,25728,6,ALPS,5,10.992371,5.284554,234.012,2.025,0.335812,1.149953,"Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",3.12.13

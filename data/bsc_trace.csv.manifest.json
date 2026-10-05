@@ -1,0 +1,25 @@
+{
+  "chain": "BNB Smart Chain",
+  "chain_id": 56,
+  "csv_sha256": "eae06dc890f406e23dec365c95a8dcb46391536ee778635fa8c9a55c2b1358de",
+  "first_block_utc": "2026-08-14T15:42:10+00:00",
+  "last_block_utc": "2026-08-14T16:00:54+00:00",
+  "requested_blocks": 2500,
+  "requested_first_block": 115914330,
+  "requested_last_block": 115916829,
+  "retrieved_utc": "2026-08-14T17:08:34.208499+00:00",
+  "rows": 25728,
+  "rpc": "https://bsc-rpc.publicnode.com",
+  "scanned_blocks": 2500,
+  "selection": "nonzero direct ERC-20 transfer(address,uint256) calls; self-transfers excluded",
+  "token_contracts": {
+    "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82": "CAKE",
+    "0x1d2f0da169ceb9fc7b3144628db156f3f6c60dbe": "XRP",
+    "0x2170ed0880ac9a755fd29b2688956bd959f933f8": "ETH",
+    "0x55d398326f99059ff775485246999027b3197955": "USDT",
+    "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c": "BTCB",
+    "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d": "USDC",
+    "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c": "WBNB",
+    "0xe9e7cea3dedca5984780bafc599bd69add087d56": "BUSD"
+  }
+}

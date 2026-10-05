@@ -1,0 +1,22 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+
+# Local experiment and manuscript QA scratch files
+tmp/
+ALPS_conference_submission/tmp/
+ALPS_conference_submission/_qa*/
+
+# LaTeX build intermediates (keep the reviewed PDFs)
+*.aux
+*.blg
+*.log
+*.out
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
