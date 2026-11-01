@@ -1,0 +1,139 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{amiri2019parblockchain}
+Amiri, M.J., Agrawal, D., El~Abbadi, A.: {ParBlockchain}: Leveraging
+  transaction parallelism in permissioned blockchain systems. In: 2019 IEEE
+  39th International Conference on Distributed Computing Systems. pp.
+  1337--1347. ICDCS '19, IEEE (2019). \doi{10.1109/ICDCS.2019.00134}
+
+\bibitem{amiri2021sharper}
+Amiri, M.J., Agrawal, D., El~Abbadi, A.: {SharPer}: Sharding permissioned
+  blockchains over network clusters. In: Proceedings of the 2021 International
+  Conference on Management of Data. pp. 76--88. SIGMOD '21, ACM (2021).
+  \doi{10.1145/3448016.3452807}
+
+\bibitem{bartoletti2021theory}
+Bartoletti, M., Galletta, L., Murgia, M.: A theory of transaction parallelism
+  in blockchains. Logical Methods in Computer Science  \textbf{17}(4),
+  10:1--10:30 (2021). \doi{10.46298/lmcs-17(4:10)2021}
+
+\bibitem{blackshear2024sui}
+Blackshear, S., Chursin, A., Danezis, G., Kichidis, A., Kokoris-Kogias, L., Li,
+  X., Logan, M., Menon, A., Nowacki, T., Sonnino, A., Williams, B., Zhang, L.:
+  {Sui Lutris}: A blockchain combining broadcast and consensus. In: Proceedings
+  of the 2024 ACM SIGSAC Conference on Computer and Communications Security.
+  pp. 2606--2620. CCS '24, ACM (2024). \doi{10.1145/3658644.3670286}
+
+\bibitem{chen2021peep}
+Chen, Z., Qi, X., Du, X., Zhang, Z., Jin, C.: {PEEP}: A parallel execution
+  engine for permissioned blockchain systems. In: Database Systems for Advanced
+  Applications. pp. 341--357. DASFAA '21, Springer (2021).
+  \doi{10.1007/978-3-030-73200-4_24}
+
+\bibitem{chishti2021}
+Chishti, M.S., Banerjee, A.: Increasing {TPS} rate of state-based blockchains
+  by parallel mining. Internet Technology Letters  \textbf{4}(2), ~e220 (2021).
+  \doi{10.1002/itl2.220}
+
+\bibitem{curino2010}
+Curino, C., Zhang, Y., Jones, E.P.C., Madden, S.: Schism: A workload-driven
+  approach to database replication and partitioning. Proceedings of the VLDB
+  Endowment  \textbf{3}(1--2),  48--57 (2010). \doi{10.14778/1920841.1920853}
+
+\bibitem{dickerson2017}
+Dickerson, T., Gazzillo, P., Herlihy, M., Koskinen, E.: Adding concurrency to
+  smart contracts. In: Proceedings of the 36th ACM Symposium on Principles of
+  Distributed Computing. pp. 303--312. PODC '17, ACM (2017).
+  \doi{10.1145/3087801.3087835}
+
+\bibitem{gelashvili2023}
+Gelashvili, R., Spiegelman, A., Xiang, Z., Danezis, G., Li, Z., Malkhi, D.,
+  Xia, Y., Zhou, R.: {Block-STM}: Scaling blockchain execution by turning
+  ordering curse to a performance blessing. In: Proceedings of the 28th ACM
+  SIGPLAN Annual Symposium on Principles and Practice of Parallel Programming.
+  pp. 232--244. PPoPP '23, ACM (2023). \doi{10.1145/3572848.3577524}
+
+\bibitem{hong2023prophet}
+Hong, Z., Guo, S., Zhou, E., Zhang, J., Chen, W., Liang, J., Zhang, J., Zomaya,
+  A.Y.: {Prophet}: Conflict-free sharding blockchain via byzantine-tolerant
+  deterministic ordering. In: IEEE INFOCOM 2023--IEEE Conference on Computer
+  Communications. pp. 1--10. IEEE (2023).
+  \doi{10.1109/INFOCOM53939.2023.10228939}
+
+\bibitem{brokerchain2022}
+Huang, H., Peng, X., Zhan, J., Zhang, S., Lin, Y., Zheng, Z., Guo, S.:
+  {BrokerChain}: A cross-shard blockchain protocol for account/balance-based
+  state sharding. In: IEEE INFOCOM 2022--IEEE Conference on Computer
+  Communications. pp. 1968--1977. IEEE (2022).
+  \doi{10.1109/INFOCOM48880.2022.9796859}
+
+\bibitem{karypis1998metis}
+Karypis, G., Kumar, V.: A fast and high quality multilevel scheme for
+  partitioning irregular graphs. SIAM Journal on Scientific Computing
+  \textbf{20}(1),  359--392 (1998). \doi{10.1137/S1064827595287997}
+
+\bibitem{shardscheduler2021}
+Kr{\'o}l, M., Ascigil, O., Rene, S., Sonnino, A., Al-Bassam, M., Rivi{\`e}re,
+  E.: Shard scheduler: Object placement and migration in sharded account-based
+  blockchains. In: Proceedings of the 3rd ACM Conference on Advances in
+  Financial Technologies. pp. 43--56. AFT '21, ACM (2021).
+  \doi{10.1145/3479722.3480989}
+
+\bibitem{liu2026concordia}
+Liu, Y., Jia, L., Yang, X., Li, Z., Sun, Y.: {Concordia}: Enabling low-conflict
+  distributed transaction scheduling in sharding blockchain via cooperative
+  perception. In: Proceedings of the ACM Web Conference 2026. pp. 5493--5502.
+  WWW '26, ACM (2026). \doi{10.1145/3774904.3792469}
+
+\bibitem{optchain2019}
+Nguyen, L.N., Nguyen, T.D.T., Dinh, T.N., Thai, M.T.: {OptChain}: Optimal
+  transactions placement for scalable blockchain sharding. In: 2019 IEEE 39th
+  International Conference on Distributed Computing Systems. pp. 525--535.
+  ICDCS '19, IEEE (2019). \doi{10.1109/ICDCS.2019.00059}
+
+\bibitem{monoxide2019}
+Wang, J., Wang, H.: Monoxide: Scale out blockchains with asynchronous consensus
+  zones. In: 16th USENIX Symposium on Networked Systems Design and
+  Implementation. pp. 95--112. NSDI '19, USENIX Association (2019),
+  \url{https://www.usenix.org/conference/nsdi19/presentation/wang-jiaping}
+
+\bibitem{wang2024orbit}
+Wang, X., Li, B., Jia, L., Sun, Y.: {Orbit}: A dynamic account allocation
+  mechanism in sharding blockchain system. In: 2024 IEEE 44th International
+  Conference on Distributed Computing Systems. pp. 333--344. ICDCS '24, IEEE
+  (2024). \doi{10.1109/ICDCS60910.2024.00039}
+
+\bibitem{wood2014}
+Wood, G.: Ethereum: A secure decentralised generalised transaction ledger.
+  Ethereum Yellow Paper (2014),
+  \url{https://ethereum.github.io/yellowpaper/paper.pdf}
+
+\bibitem{xu2025vegeta}
+Xu, T., Zhong, Y., Zhang, Y., Xiong, R., Zhang, J., Xue, G., Liu, S.: Vegeta:
+  Enabling parallel smart contract execution in leaderless blockchains. In:
+  22nd USENIX Symposium on Networked Systems Design and Implementation. pp.
+  795--811. NSDI '25, USENIX Association (2025),
+  \url{https://www.usenix.org/conference/nsdi25/presentation/xu-tianjing}
+
+\bibitem{txallo2023}
+Zhang, Y., Pan, S., Yu, J.: {TxAllo}: Dynamic transaction allocation in sharded
+  blockchain systems. In: 2023 IEEE 39th International Conference on Data
+  Engineering. pp. 721--733. ICDE '23, IEEE (2023).
+  \doi{10.1109/ICDE55515.2023.00390}
+
+\bibitem{zhang2025mosaic}
+Zhang, Y., Pan, S., Yu, J.: {Mosaic}: Client-driven account allocation
+  framework in sharded blockchains. In: 2025 IEEE 45th International Conference
+  on Distributed Computing Systems. pp. 604--614. ICDCS '25, IEEE (2025).
+  \doi{10.1109/ICDCS63083.2025.00065}
+
+\bibitem{zhen2024semantichain}
+Zhen, Z., Wang, X., Yang, X., Shu, J., Hu, J., Lin, H., Yi, X.: {SemantiChain}:
+  A trust retrieval blockchain based on semantic sharding. IEEE Transactions on
+  Information Forensics and Security  \textbf{19},  10339--10354 (2024).
+  \doi{10.1109/TIFS.2024.3488501}
+
+\end{thebibliography}

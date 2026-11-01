@@ -1,0 +1,57 @@
+{
+  "traces": [
+    {
+      "trace": "eth_aug14",
+      "selected": 100,
+      "seed": 0,
+      "rpc_endpoint": "https://eth.llamarpc.com",
+      "input_sha256": "da99d5bc3b08193688e58905cb02275e9c6b872a9839522cba0253cd69da5e95",
+      "classifications": {
+        "unavailable": 100
+      },
+      "block_checks": {
+        "unavailable": 100
+      },
+      "receipt_checks": {
+        "unavailable": 100
+      },
+      "network_requests": 200
+    },
+    {
+      "trace": "eth_aug13",
+      "selected": 100,
+      "seed": 0,
+      "rpc_endpoint": "https://eth.llamarpc.com",
+      "input_sha256": "bc37c9f406df236df9bb5f4ee8e38927de7d002f7a24c5a422906c6d9748e0e5",
+      "classifications": {
+        "unavailable": 100
+      },
+      "block_checks": {
+        "unavailable": 100
+      },
+      "receipt_checks": {
+        "unavailable": 100
+      },
+      "network_requests": 400
+    },
+    {
+      "trace": "eth_aug07",
+      "selected": 100,
+      "seed": 0,
+      "rpc_endpoint": "https://eth.llamarpc.com",
+      "input_sha256": "196735ed5d500a49cd76d71f67d0ca511ca8f1d473dd4528582d652b0e4bdca3",
+      "classifications": {
+        "unavailable": 100
+      },
+      "block_checks": {
+        "unavailable": 100
+      },
+      "receipt_checks": {
+        "unavailable": 100
+      },
+      "network_requests": 400
+    }
+  ],
+  "attempts_per_rpc": 2,
+  "interpretation": "unavailable is unresolved, never inferred reverted"
+}

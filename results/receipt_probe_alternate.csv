@@ -1,0 +1,3 @@
+trace,csv_row,block,tx_index,token,symbol,tx_hash,classification,matching_logs,gas_used,error
+eth_aug13,25247,25744787,20,0xdac17f958d2ee523a2206206994597c13d831ec7,USDT,0xb9f40ddd710802e132d0823802079f36f2e62b5bb4aa3ca7f542593e09450162,unavailable,0,,RuntimeError: RPC returned null: historical record unavailable
+bsc,12623,115915647,102,0x55d398326f99059ff775485246999027b3197955,USDT,0x52af693ece03a08dc560d15b56897942fc0bc4d43291cadad445878d0a566fe3,success_matching_transfer,1,51627,

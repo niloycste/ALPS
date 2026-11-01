@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "python": "3.13.7",
+  "senders": 12,
+  "initial_prototypes": 3,
+  "all_pair_distances": 36,
+  "nonzero_all_pair_distances": 24,
+  "observed_median_calls_during_alps": 1,
+  "semantic_scale_assignments_in_alps_source": 1,
+  "observed_scale": 2.0000000000000004,
+  "expected_all_pair_scale": 2.0000000000000004,
+  "assigned_only_scale": 1.0,
+  "conclusion": "ALPS takes the median of all nonzero sender-to-initial-prototype squared distances exactly once and reuses that fixed scalar."
+}

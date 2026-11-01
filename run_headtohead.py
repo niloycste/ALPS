@@ -33,9 +33,11 @@ RESULTS = os.path.join(HERE, "results")
 BLOCK = 250
 REGIONS = (2, 3, 4, 6, 8, 11)
 SEEDS = (0, 1, 2)
-SCHEMES = [
+DEFAULT_SCHEMES = [
     "ADDR-MOD", "METIS-SENDER", "TXALLO", "SENDER-KMEANS-BAL", "ALPS",
 ]
+SCHEMES = [name for name in os.environ.get(
+    "ALPS_HEADTOHEAD_METHODS", ",".join(DEFAULT_SCHEMES)).split(",") if name]
 TXALLO_ETA = 2.0
 TXALLO_MAX_ITER = 8
 TRACES = {
@@ -104,7 +106,8 @@ def main() -> None:
     if missing:
         print(f"  (missing: {', '.join(missing)})")
 
-    with ProcessPoolExecutor(max_workers=min(4, len(jobs))) as ex:
+    workers = max(1, int(os.environ.get("ALPS_HEADTOHEAD_WORKERS", "4")))
+    with ProcessPoolExecutor(max_workers=min(workers, len(jobs))) as ex:
         futures = {ex.submit(run_trace, tag, path): tag for tag, path in jobs}
         for future in as_completed(futures):
             rows.extend(future.result())
@@ -115,13 +118,14 @@ def main() -> None:
                              scheme_order[r["strategy"]], r["seed"]))
 
     os.makedirs(RESULTS, exist_ok=True)
-    p = os.path.join(RESULTS, "headtohead.csv")
+    output_name = os.environ.get("ALPS_HEADTOHEAD_OUTPUT", "headtohead.csv")
+    p = os.path.join(RESULTS, output_name)
     fields = list(dict.fromkeys(k for r in rows for k in r))
     with open(p, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
         w.writerows(rows)
-    print(f"\nwrote headtohead.csv ({len(rows)} rows)")
+    print(f"\nwrote {output_name} ({len(rows)} rows)")
 
 
 if __name__ == "__main__":

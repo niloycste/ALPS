@@ -1,0 +1,11 @@
+name: alps-metis
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.15
+  - numpy=2.5.4
+  - pandas=3.0.6
+  - scikit-learn=1.9.1
+  - networkx=3.7
+  - pymetis=2025.2.2
+  - pypdf=6.20.1

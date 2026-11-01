@@ -1,0 +1,146 @@
+{
+  "arguments": {
+    "methods": "SENDER-KMEANS-BAL,TXALLO,ALPS",
+    "traces": "eth_aug14,eth_aug13,eth_aug07,bsc",
+    "seeds": "0,1,2",
+    "history": 0.7,
+    "horizon_multiplier": 0.5,
+    "repetitions": 250,
+    "output": "prospective_core"
+  },
+  "targets": [
+    0.5,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99,
+    1.0
+  ],
+  "traces": [
+    {
+      "trace": "eth_aug14",
+      "input_sha256": "da99d5bc3b08193688e58905cb02275e9c6b872a9839522cba0253cd69da5e95",
+      "history_calls": 24028,
+      "cutoff_block": "25752675",
+      "cutoff_tx_index": "33",
+      "horizon_calls": 12014,
+      "token_medians": {
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 296005000.0,
+        "0xdac17f958d2ee523a2206206994597c13d831ec7": 132667560.0,
+        "0x514910771af9ca656af840dff83e8264ecf986ca": 1.5908931284e+20,
+        "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce": 1.0569504e+25,
+        "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": 6.5806440914e+20,
+        "0x6b175474e89094c44da98b954eedeac495271d0f": 1.2155602734153246e+20,
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 5050000000000000.0,
+        "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 1707339.0
+      },
+      "oov_amount_median": 172033500.0,
+      "token_feature_coordinates": {
+        "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": 0,
+        "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 1,
+        "0x514910771af9ca656af840dff83e8264ecf986ca": 2,
+        "0x6b175474e89094c44da98b954eedeac495271d0f": 3,
+        "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce": 4,
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 5,
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 6,
+        "0xdac17f958d2ee523a2206206994597c13d831ec7": 7
+      }
+    },
+    {
+      "trace": "eth_aug13",
+      "input_sha256": "bc37c9f406df236df9bb5f4ee8e38927de7d002f7a24c5a422906c6d9748e0e5",
+      "history_calls": 27597,
+      "cutoff_block": "25744827",
+      "cutoff_tx_index": "41",
+      "horizon_calls": 13799,
+      "token_medians": {
+        "0xdac17f958d2ee523a2206206994597c13d831ec7": 138669505.5,
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 290000000.0,
+        "0x514910771af9ca656af840dff83e8264ecf986ca": 5e+19,
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 859488247287503.0,
+        "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce": 1.2170512740424478e+25,
+        "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 391442.0,
+        "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": 8.97869385335e+20,
+        "0x6b175474e89094c44da98b954eedeac495271d0f": 1.018914957151866e+21
+      },
+      "oov_amount_median": 172587165.0,
+      "token_feature_coordinates": {
+        "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": 0,
+        "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 1,
+        "0x514910771af9ca656af840dff83e8264ecf986ca": 2,
+        "0x6b175474e89094c44da98b954eedeac495271d0f": 3,
+        "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce": 4,
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 5,
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 6,
+        "0xdac17f958d2ee523a2206206994597c13d831ec7": 7
+      }
+    },
+    {
+      "trace": "eth_aug07",
+      "input_sha256": "196735ed5d500a49cd76d71f67d0ca511ca8f1d473dd4528582d652b0e4bdca3",
+      "history_calls": 32125,
+      "cutoff_block": "25704255",
+      "cutoff_tx_index": "75",
+      "horizon_calls": 16063,
+      "token_medians": {
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 284589497.5,
+        "0xdac17f958d2ee523a2206206994597c13d831ec7": 282530000.0,
+        "0x6b175474e89094c44da98b954eedeac495271d0f": 1.0927117224800135e+21,
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 4237154424104913.5,
+        "0x514910771af9ca656af840dff83e8264ecf986ca": 2.530878832e+19,
+        "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce": 1.000084053236558e+25,
+        "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": 1.9545157035e+20,
+        "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 2912940.0
+      },
+      "oov_amount_median": 282968876.0,
+      "token_feature_coordinates": {
+        "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": 0,
+        "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 1,
+        "0x514910771af9ca656af840dff83e8264ecf986ca": 2,
+        "0x6b175474e89094c44da98b954eedeac495271d0f": 3,
+        "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce": 4,
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 5,
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 6,
+        "0xdac17f958d2ee523a2206206994597c13d831ec7": 7
+      }
+    },
+    {
+      "trace": "bsc",
+      "input_sha256": "eae06dc890f406e23dec365c95a8dcb46391536ee778635fa8c9a55c2b1358de",
+      "history_calls": 18009,
+      "cutoff_block": "115916113",
+      "cutoff_tx_index": "37",
+      "horizon_calls": 9005,
+      "token_medians": {
+        "0x55d398326f99059ff775485246999027b3197955": 6e+19,
+        "0x2170ed0880ac9a755fd29b2688956bd959f933f8": 2.0322e+16,
+        "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d": 3.375629841357235e+19,
+        "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c": 1000000000000000.0,
+        "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82": 1.3851831429913944e+19,
+        "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c": 8745461419086975.0,
+        "0x1d2f0da169ceb9fc7b3144628db156f3f6c60dbe": 1.98507076665e+20
+      },
+      "oov_amount_median": 5.7e+19,
+      "token_feature_coordinates": {
+        "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82": 0,
+        "0x1d2f0da169ceb9fc7b3144628db156f3f6c60dbe": 1,
+        "0x2170ed0880ac9a755fd29b2688956bd959f933f8": 2,
+        "0x55d398326f99059ff775485246999027b3197955": 3,
+        "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c": 4,
+        "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d": 5,
+        "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c": 6
+      }
+    }
+  ],
+  "python": "3.13.7",
+  "dependencies": {
+    "numpy": "2.4.2",
+    "scikit-learn": "1.8.0",
+    "networkx": "3.6.1"
+  },
+  "planning": "ceil(history_calls * preset horizon_multiplier); no suffix count used",
+  "cold_token_policy": "all-region queries; OOV one-hot; history-wide median amount scale",
+  "graph_baseline_extension": "first-arrival receiver indicator .15 + quadratic load .20; pinned",
+  "limitations": "chronological holdout, not a deployed system; no receipt filtering; timings are local scans"
+}

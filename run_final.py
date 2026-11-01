@@ -189,7 +189,7 @@ def temporal(path, regions=(6,), fracs=(0.5, 0.6, 0.7, 0.8),
              seeds=(0, 1, 2),
              modes=("HASH", "SENDER-KMEANS", "SENDER-KMEANS-BAL", "ALPS")):
     wl = NativeWorkload(path, initial_balance=1000.0)
-    txs, _ = wl.generate()
+    txs, _ = wl.generate_temporal(frac=min(fracs))
     print(f"\n[temporal] {len(txs)} transactions")
     rows = []
     for frac in fracs:
@@ -207,7 +207,7 @@ def temporal_sensitivity(path, n=6, fracs=(0.5, 0.6, 0.7, 0.8),
                          graph_weights=(0.08, 0.15, 0.35)):
     """Check that the ALPS graph-weight choice survives temporal separation."""
     wl = NativeWorkload(path, initial_balance=1000.0)
-    txs, _ = wl.generate()
+    txs, _ = wl.generate_temporal(frac=min(fracs))
     print(f"\n[temporal-sensitivity] {len(txs)} transactions")
     rows = []
     for weight in graph_weights:
@@ -218,6 +218,26 @@ def temporal_sensitivity(path, n=6, fracs=(0.5, 0.6, 0.7, 0.8),
                     graph_weight=weight)
                 row["variant"] = f"GW-{weight:g}"
                 rows.append(row)
+    return rows
+
+
+def temporal_horizon_sensitivity(path, n=6, frac=0.7,
+                                 multipliers=(0.5, 1.0, 1.5, 2.0),
+                                 seeds=(0, 1, 2)):
+    """Vary the declared placement horizon around the observed suffix size."""
+    wl = NativeWorkload(path, initial_balance=1000.0)
+    txs, _ = wl.generate_temporal(frac=frac)
+    suffix_size = len(txs) - int(len(txs) * frac)
+    rows = []
+    for multiplier in multipliers:
+        horizon = max(1, round(suffix_size * multiplier))
+        for seed in seeds:
+            row = run_temporal_allocator(
+                txs, n, "ALPS", frac=frac, seed=seed,
+                horizon_size=horizon)
+            row["horizon_multiplier"] = multiplier
+            row["horizon_size"] = horizon
+            rows.append(row)
     return rows
 
 

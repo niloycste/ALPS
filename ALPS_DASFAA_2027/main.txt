@@ -1,0 +1,1112 @@
+     ALP S: Admissible Locality and Payload
+    Semantics for Region-Based Parallel Mining
+
+                               Anonymous Author(s)
+
+                               Anonymous Institution
+
+
+      Abstract. Semantic transaction partitioning is not only an optimisation
+      problem; the partition must also work correctly under the execution
+      model. In region-based parallel mining, all regions validate transactions
+      concurrently from the same start-of-round state, so payload clustering
+      can place operations on the same state in different regions. Within this
+      independent-barrier additive-merge model with no coordination, the pa-
+      per characterises guarded-key locality as necessary and sufficient for
+      balance non-negativity; it makes no completeness, liveness, or general
+      EVM-validity claim. Ethereum’s global account nonce creates cross-region
+      ordering dependencies when a sender is split; ALPS enforces sender local-
+      ity for the evaluated direct calls. The static allocator optimises payload
+      similarity, conditional active-account interaction cut, and historical al-
+      location load under a hard effective load constraint. Its fixed-horizon
+      chronological replay freezes feature scaling from an earlier prefix and has
+      no lifetime load-cap guarantee. On a 34,326-call Ethereum trace with six
+      regions, transaction k-means splits 1,021 guarded keys and takes 1,068
+      barrier rounds, while ALPS has zero split senders and guarded keys and
+      takes 27 rounds. Across three Ethereum mainnet traces and one BNB
+      Smart Chain trace (145,372 calls), ALPS improves retrieval locality and
+      conditional interaction cut over address hashing in all 24 trace/region
+      settings. Compared with balanced sender k-means, ALPS reduces the
+      cut in all 24 settings by 12.8–82.5%; R90 improves in 19 settings, ties in
+      two, and trades off in three. The contribution is a scoped balance-safety
+      formalisation and a cost-selectable allocator, not universal sharding safety
+      or production TPS.
+
+
+Keywords: blockchain, parallel mining, transaction partitioning, clustering,
+state conflicts, Ethereum
+
+
+1   Introduction
+State-based blockchains usually process transactions in sequence because trans-
+action validity depends on a shared and changing state [?]. Region-based parallel
+mining [?] reduces this bottleneck by dividing pending transactions among re-
+gions. Each region mines independently, and the regional blocks are joined at a
+barrier into a super-block. The original proposal assigns the initiating account
+by address modulo but permits configurable assignment. This work targets its
+transaction-allocation and scheduling layer, not consensus mining performance.
+2         Anonymous Author(s)
+
+    This flexibility creates an opportunity to improve transaction locality. Recent
+work has explored semantic sharding for blockchain retrieval [?] and workload-
+aware account placement to reduce cross-shard traffic or adapt to changing
+workloads [?,?,?]. Conflict-oriented systems instead change cross-shard ordering or
+scheduling to avoid conflicting execution [?, ?]. These directions motivate smarter
+placement, but they do not characterise admissibility for the independent-barrier
+model considered here. Transactions can be grouped by application payload so
+that semantically related records stay in the same region, reducing the number of
+regions scanned by an asset query. However, payload describes an operation, not
+the state that the operation conditionally consumes. Two miners can therefore
+validate debits of the same balance against the same stale snapshot. Guarded-key
+locality protects balances; stronger sender locality also keeps Ethereum’s account-
+wide nonce dependencies region-local. Therefore, high clustering quality does not
+guarantee an executable blockchain schedule, while simple address hashing loses
+useful locality. This paper asks what state-locality invariant is required by the
+independent-barrier model and how much semantic and interaction locality can
+be recovered while enforcing it as a hard constraint. The work follows three steps:
+characterise model-specific admissibility, choose an allocation unit that preserves
+it, and optimise multiple locality objectives only within that feasible space.
+    The main contributions of this paper are:
+
+    – A necessary-and-sufficient characterisation of balance-safety admissibility for
+      concurrent, same-snapshot regional execution with additive merging and no
+      cross-region serialization, formalising a single-region guarded-key discipline.
+    – ALPS (Admissible Locality and Payload Semantics), a sender-indivisible
+      allocator that combines weighted semantic prototypes, an interaction-graph
+      cut, and a load penalty under a hard static historical-load constraint. Exact
+      whole-sender moves give monotone local refinement; the related chronological
+      heuristic pins senders but has no lifetime load-cap guarantee.
+    – A balance-safety and locality evaluation over four direct-call traces (three
+      Ethereum and one BNB Smart Chain; 145,372 calls) and a separate 17,445-
+      event log trace. It uses observed signer-nonce order, synthetic per-token
+      balance stress, static tests, fixed-horizon replays, ablations, and a reimple-
+      mented TxAllo allocation-objective comparison; locality gains and load/cut
+      trade-offs are reported.
+
+    The scope is limited to the independent-barrier model. Protocols with locks,
+optimistic validation, cross-shard atomicity, or re-execution can safely use more
+general partitions, but they require a coordination mechanism that the model
+studied here omits.
+    The rest of this paper is organised as follows. Section II reviews related
+work. Section III presents the proposed work, including the execution model,
+admissibility conditions, and the proposed ALPS method. Section IV describes
+the experimental setup. Section V presents the performance evaluation. Section VI
+concludes the paper and outlines future work.
+                         ALPS: Admissible Locality and Payload Semantics          3
+
+2   Related Work
+
+Prior work can be grouped into conflict-aware parallel execution, coordinated
+sharding, semantic sharding and retrieval, workload-aware placement, and database
+partitioning. This grouping separates conflict-handling mechanisms from place-
+ment objectives and places ALPS within the uncoordinated barrier model.
+    Chishti and Banerjee [?] introduced the independent regional model studied
+in this paper. Other approaches alter execution to handle conflicts explicitly.
+Dickerson et al. [?] and Block-STM [?] detect and re-execute conflicts, while static
+analysis characterises parallelism [?]. ParBlockchain [?] and PEEP [?] encode
+dependency schedules, Vegeta speculates and replays [?], and Sui Lutris supports
+object-level independence [?]. Prophet uses Byzantine-tolerant deterministic
+ordering to avoid conflicting cross-shard execution [?], while the recent Concordia
+system targets low-conflict distributed transaction scheduling across shards [?].
+These mechanisms or programming models are not part of the independent
+barrier.
+    Coordinated sharding also changes the execution protocol. SharPer coordinates
+cross-shard transactions [?], while Monoxide provides eventual atomicity across
+zones [?]. Therefore, the admissibility condition derived in Section ?? does not
+restrict these systems; it characterises the cheaper uncoordinated barrier model.
+    Semantic sharding has separately targeted retrieval and storage locality. Se-
+mantiChain allocates transactions using semantic features and semantic distance,
+and couples that placement with a distributed semantic retrieval architecture [?].
+ALPS uses payload semantics for a different purpose: semantic locality is opti-
+mised only after the allocation unit has been restricted to preserve admissibility
+under same-snapshot independent regional execution.
+    Workload-aware placement is the closest algorithmic line of work. OptChain
+reduces cross-shard traffic using an online graph [?]; Shard Scheduler places and
+migrates objects [?]; BrokerChain combines partitioning with broker accounts [?];
+and TxAllo jointly optimises traffic and workload balance [?]. More recent work
+extends account allocation in complementary directions: Orbit uses pending
+transactions to react to changing traffic before packaging [?], whereas Mosaic
+moves allocation toward client-driven local optimisation using interaction and
+workload information [?]. ALPS instead combines retrieval locality, active-account
+interaction cuts, guarded-state admissibility, and a hard historical-load bound in
+its static allocator. Section ?? directly compares the TxAllo allocation objective.
+Since A-TxAllo already places new nodes chronologically, the temporal test in
+this paper is used as robustness evidence rather than a precedence claim.
+    Database partitioning provides a broader comparison. Schism balances a co-
+access graph to reduce distributed transactions [?]. ALPS follows the same general
+principle but moves only whole senders, making the schedule admissible without
+abort or retry coordination. The evaluation also applies weighted multilevel
+METIS [?] directly to the active-sender graph, separating a general graph cut
+from ALPS’s explicit semantic term and effective load constraint.
+4       Anonymous Author(s)
+
+3     Proposed Work
+
+This section first defines the independent-barrier execution model and its ad-
+missibility requirements. It then presents the proposed ALPS method for static
+allocation and fixed-horizon chronological replay.
+
+
+3.1   System Model and Admissibility
+
+The model imposes a balance-safety locality condition and exposes a separate
+nonce-ordering cost when senders are fragmented under independent regional
+execution.
+
+
+Independent-barrier Execution Let T be a transaction set and P : T →
+{1, . . . , n} its static region assignment. At the start of round k, every region reads
+the same committed state σk . Each region executes concurrently with the others,
+processes its transactions sequentially on a private copy, and accepts a debit
+only if its local balance is sufficient; an insufficient-balance debit is rejected in
+that execution. Regions neither observe nor serialize with one another during the
+round. At the barrier, all accepted debit and credit deltas are merged additively
+to form σk+1 . This follows the execution structure of the base parallel-mining
+design [?]; proof-of-work is independent of the state argument considered here.
+     An ERC-20 balance is associated with both an account and a token contract.
+Let b = (a, c) denote the balance of account a in token contract c. A transfer
+t = (a, d, c, x, q) conditionally consumes x from debit key g(t) = (a, c), credits
+(d, c), and carries account-wide nonce q. Credits are unconditional additions,
+whereas debits are guarded non-commutative operations.
+     For balance safety, all transactions that debit the same guarded key must
+stay in the same region. This requirement, called guarded-key locality, can be
+written as
+                            g(ti ) = g(tj ) =⇒ P (ti ) = P (tj ).
+A partition is balance-safe barrier-admissible if, for every non-negative starting
+balance vector and every same-round transfer workload, independently validated
+deltas cannot merge into a negative balance. This property concerns balance
+non-negativity only, not nonce validity, completeness, or liveness.
+
+Theorem 1 (Balance-Safety Admissibility). Under the concurrent same-
+snapshot, additive-merge execution just defined, without cross-region serialization
+or revalidation, a static transfer partition is balance-safe barrier-admissible for
+every non-negative starting balance vector and same-round workload if and only
+if it satisfies guarded-key locality.
+
+Proof. For sufficiency, consider a guarded key b in round k. Guarded-key locality
+implies that only one region r can debit b. Sequential local validation in that
+region gives
+                              Dr (b) ≤ σk (b) + Cr (b),
+                          ALPS: Admissible Locality and Payload Semantics            5
+
+where Dr (b) and Cr (b) are the debit and credit totals of region r. After the
+regional changes are merged,
+                                 X                   X
+             σk+1 (b) = σk (b) +   Cj (b) − Dr (b) ≥   Cj (b) ≥ 0.
+                                    j                    j̸=r
+
+Thus, the merged balance cannot become negative, and the same argument
+applies inductively over subsequent rounds.
+    For necessity, suppose the static assignment places two debits of the same
+guarded key in different regions in the same round, with positive debit totals d1
+and d2 , and no credits are made to that key. If the starting balance is max(d1 , d2 ),
+both regions can accept their debits because they validate against the same
+starting state. After the regional changes are merged, the balance becomes
+                             max(d1 , d2 ) − d1 − d2 < 0.
+Hence any such partition fails to be balance-safe barrier-admissible for some
+starting balance and same-round workload.
+    This result is specific to the independent-barrier model. For example, Monoxide
+provides asynchronous cross-zone transaction semantics [?], while Block-STM
+detects conflicts and re-executes transactions [?]. These systems therefore do not
+follow the uncoordinated merge assumed here. For the same direct ERC-20 balance
+abstraction in a fuller Ethereum execution, nonce serialization, revalidation, or
+scheduling may prevent simultaneous acceptance; guarded-key locality remains
+sufficient, but this theorem does not claim it is necessary for those coordinated
+models.
+
+Sender Locality for Global Nonces Ethereum’s transaction nonce is keyed by
+account rather than by token. Under the independent-barrier model, splitting one
+sender across regions creates cross-region ordering dependencies: future-nonce
+transactions may need to wait for lower nonces committed elsewhere. ALPS
+therefore enforces sender locality, placing all transactions from sender a, across
+all tokens, in one region so that nonce order can progress without cross-barrier
+deferral. Sender locality is stronger than guarded-key locality for the evaluated
+direct calls, where the outer signer is the token debitor; it does not automatically
+extend to routers or arbitrary contract read/write sets. It preserves both token-
+balance locality and account order structurally. This distinction between sender
+fragmentation and sender-local allocation is illustrated in Figure ??. For example,
+two calls from one signer that debit different tokens have different guarded keys,
+so assigning each key to a separate region satisfies the balance theorem. If the
+calls have consecutive account nonces, however, the higher-nonce call still depends
+on the lower-nonce call committing first. Guarded-key locality alone therefore
+does not guarantee nonce-correct progress.
+Corollary 1 (Direct-Call Locality). For the evaluated direct ERC-20 calls,
+where the outer signer is the debited token holder, sender locality implies guarded-
+key locality and makes every submitted account-nonce dependency region-local.
+6       Anonymous Author(s)
+
+
+
+
+Fig. 1. Overview of ALPS and the role of sender locality. Splitting a sender across
+regions creates cross-region nonce dependencies under independent-barrier execution,
+whereas sender-local allocation preserves nonce order within a region. ALPS enforces
+whole-sender allocation and jointly optimises semantic locality, interaction cut, and
+historical-load balance under an effective load bound.
+
+
+Proof. All guarded keys (a, c) belonging to sender a map to the sender’s single
+region, and every submitted transaction carrying a’s account nonce maps to that
+same region. The claim does not extend to arbitrary contract read/write sets or
+mediated calls where signer and debited state owner differ.
+
+    If a sender is split across regions, a correct mempool must not permanently
+reject a future-nonce transaction. Instead, the transaction should be deferred
+and retried after lower nonces commit. This preserves eventual correctness, but
+different fragments of the same sender sequence can progress only across barriers,
+which increases the scheduling cost. Section ?? evaluates this effect. A separate
+balance-only execution is also used as a deliberate stress test of the guarded-key
+locality condition; it is not presented as a replacement for Ethereum’s nonce rule.
+
+
+3.2   Proposed Method: ALPS
+
+ALPS uses sender-indivisible allocation and combines semantic locality, interac-
+tion locality, and load control (Figure ??). The proposed method first performs
+static allocation and then extends it with chronological sender pinning.
+
+
+Allocation Unit and Objective ALPS treats each active sender a and its
+complete transaction sequence as one indivisible unit. Let wa denote its historical
+transaction count, xa its mean payload feature vector, and eab the symmetrized
+number of observed submitted calls in either direction between active senders a
+                         ALPS: Admissible Locality and Payload Semantics          7
+
+                  P             P
+and b. Define W = a wa , M = {a,b} eab , the mean regional load L̄ = W/n,
+         P
+and Lr = a:za =r wa . The exact dimensionless objective is
+
+                                1 X ∥xa − µza ∥22
+                           J=         wa
+                                W a              s
+                                  λg X
+                                +          eab 1[za ̸= zb ]                     (1)
+                                  M
+                                     {a,b}
+                                      n       2
+                                  λl X Lr
+                                +
+                                  n r=1 L̄
+
+    The heuristic greedily reduces this objective subject to one region per sender
+and Lr ≤ Ceff . Because no feasible cap can be smaller than the largest indivisible
+sender, the target cap is C0 = max(αL̄, maxa wa ). When a whole-sender packing
+satisfies C0 , ALPS sets Ceff = C0 ; otherwise, the LPT fallback supplies a feasible
+certificate and Ceff is relaxed only to the maximum load of that certificate. In
+every reported run, maxa wa ≤ αL̄ and no packing relaxation was required, so
+C0 = αL̄ and Ceff = C0 . Here, s is the median nonzero semantic squared distance.
+The experiments use α = 1.15, λg = 0.15, and λl = 0.20. Section ?? reports
+the graph-weight frontier rather than treating 0.15 as universally optimal. The
+implementation requires W > 0 and at least n active senders, replaces zero M
+or s by one, retains the preceding prototype for an empty region, and resolves
+equal-cost choices by the smallest region index.
+    The preferred operating point depends on the deployment setting. Let X
+be the active-account interaction cut defined in Section ??. For a deployment
+score Dκ = R90 + κX, where κ is the relative penalty assigned to interaction-cut
+fraction in R90 -equivalent units, ALPS is preferable to a baseline B when
+                                                  B
+                                          alps
+                                         R90   − R90
+                              κ > κ⋆ =                                          (2)
+                                         XB − Xalps
+    provided Xalps < XB . A non-positive threshold means that ALPS weakly
+dominates. This formulation makes the retrieval–interaction trade-off explicit
+instead of hiding it inside a single composite score.
+    The three terms have different roles. The payload-distance term preserves asset-
+query locality, the graph term reduces active-account cross-region interactions,
+and the historical-load constraint limits how much of the trace is assigned to one
+region. It is distinct from the per-round block capacity B. Sender indivisibility
+is enforced outside the objective, so optimisation cannot trade correctness for a
+lower objective value.
+    After transaction-weighted k-means initialisation, the implementation assigns
+heavy senders first and then performs deterministic coordinate refinement with
+prototype updates (Algorithm ??). If the cost-aware seed violates the target
+cap C0 , largest-processing-time-first (LPT) packing provides a feasible whole-
+sender certificate. The refinement stage then enforces the resulting Ceff as a hard
+constraint. No reported run required relaxation beyond C0 . The implementation
+8       Anonymous Author(s)
+
+Algorithm 1 ALPS static allocation. Every operation moves a whole sender, so
+sender locality is an invariant rather than a penalty.
+Input: history Th ; regions n; α, λg , λl
+Output: one pinned region za per active sender
+ 1: compute (wa , xa ) for active senders and graph weights eab
+ 2: initialise Lr ← 0 for every region; z ← ∅
+ 3: C0 ← max(αL̄, maxa wa ) {target and indivisibility lower bound}
+ 4: initialise µ1 , . . . , µn by transaction-weighted k-means
+ 5: for senders a in non-increasing wa do
+ 6:    F ← {r : Lr + wa ≤ C0 }, or {arg minr Lr } if empty
+ 7:    za ← arg minr∈F ∆J(a → r); Lza += wa
+ 8: end for
+ 9: if maxr Lr > C0 then
+10:    reseed by LPT packing and recompute L {feasible certificate}
+11: end if
+12: Ceff ← max(C0 , maxr Lr )
+13: repeat
+14:    recompute weighted prototypes µr
+15:    for senders a in non-increasing wa do
+16:       r⋆ ← arg minr ∆J(a : za → r) s.t. Lr + wa ≤ Ceff
+17:       move all of a to r⋆ and update L if ∆J < 0
+18:    end for
+19: until no move accepted or six sweeps
+20: return {za }
+
+
+
+and fixed parameters are included with the artifact. Thus ALPS is a greedy
+local-search heuristic, not a global optimiser; Proposition 1 establishes feasibility
+and monotone descent only.
+
+Static Time Complexity Let N = |Th |, A be the active senders, E their interaction
+edges, I the weighted k-means iterations, and S ≤ 6 the refinement sweeps.
+Profiling costs O(N d), weighted k-means O(InAd), sender sorting O(A log A),
+and the seed or one sweep O(n(Ad + E)). Thus worst-case static time is
+
+                 O(N d + InAd + A log A + (S + 1)n(Ad + E)) .                     (3)
+
+LPT adds O(A log A + A log n) if invoked; no reported run required it. Allocator
+storage excluding the input is O(Ad + E + n).
+
+Proposition 1 (Monotone Constrained Refinement). With fixed prototypes,
+every accepted ALPS move strictly decreases (??) while preserving sender locality
+and the effective capacity constraint. Replacing each prototype by its transaction-
+weighted mean cannot increase the semantic term.
+
+Proof. For each candidate move, ALPS evaluates the exact change in the sender’s
+semantic term, its incident interaction-cut edges, and the load terms of the two
+affected regions. A move is accepted only when the total change is negative
+                            ALPS: Admissible Locality and Payload Semantics               9
+
+Algorithm 2 ALPS fixed-horizon chronological placement. A sender is assigned
+once, at its first appearance, so later actions do not affect the earlier assignment.
+Input: history state {za }, {µr }; regions n; stream Tf ; predefined horizon Hf ; α, λg , λl
+Output: a pinned region for every sender in Tf
+ 1: Cf ← αHf /n; initialise future loads Lr ← 0
+ 2: for transactions t ∈ Tf in chronological order do
+ 3:   a ← sender(t)
+ 4:   if a already has a region then
+ 5:      keep za unchanged {pinned; never revised}
+ 6:   else
+ 7:      ρ ← region of receiver(t) if placed, else ⊥
+ 8:      F ← {r : Lr + 1 ≤ Cf }, or all regions if empty
+ 9:      st ← median nonzero value in {∥feat(t) − µr ∥2 : r = 1, . . . , n}, or 1 if none
+10:      za ← arg minr∈F [ ∥feat(t) − µr ∥2 /st + λg 1[r ̸= ρ] + λl (Lr /Cf )2 ]
+11:      pin za
+12:   end if
+13:   route t to za ; Lza ← Lza + 1
+14: end for
+
+
+
+and the destination region has sufficient remaining capacity. Because the whole
+sender moves as one unit, sender locality is preserved. For fixed assignments, the
+transaction-weighted mean minimises the within-region squared semantic distance.
+Therefore, accepted moves strictly decrease the objective, while prototype updates
+cannot increase its semantic term. Since the assignment space is finite, unrestricted
+refinement reaches a one-move local optimum. The implementation stops after at
+most six sweeps, so it may stop earlier while still preserving monotonicity and
+feasibility.
+
+
+Fixed-Horizon Chronological Placement A chronological allocator cannot
+build a sender profile from transactions that have not yet occurred. The temporal
+version therefore learns prototypes and assignments only from a chronological
+prefix. A known sender keeps its assigned region. A sender absent from the history
+is assigned exactly once, when its first future transaction arrives. The assignment
+uses the transaction’s visible payload, the receiver’s region when the receiver is
+already placed, and the current future-prefix load. The selected region is then
+pinned.
+    Algorithm ?? is a fixed-horizon chronological replay, not a fully online deploy-
+ment experiment: it predefines Hf = |Tf | for each evaluation suffix. Conditional
+on that horizon and the prefix-fitted frozen scaling in Section ??, each placement
+uses only the prefix observed so far. Later transactions do not affect earlier sender
+assignments. Here, Lr counts transactions observed so far and Cf = αHf /n is
+the horizon target. When an unseen sender first appears, regions that can accept
+that transaction without crossing Cf form the candidate set; if none remain, all
+regions are considered. The load term then acts as a soft cost within that set.
+This admission test applies only when a sender is first pinned: later activity from
+10      Anonymous Author(s)
+
+that sender must follow its pinned region and can therefore drive realised load
+above Cf . Thus, unlike the static allocator, the chronological rule provides no
+lifetime hard-cap guarantee. Sender locality remains structural while activity
+drift can exceed the 1.15 horizon target.
+
+Chronological Time Complexity With a hash-map assignment table, routing a
+transaction from an already pinned sender takes O(1) expected time. A previously
+unseen sender is placed only once; evaluating its semantic and load-aware cost
+over all n regions costs O(nd). Therefore, for a future stream of F transactions
+containing U previously unseen senders, chronological placement costs
+
+                                   O(F + U nd),                                  (4)
+
+with the more expensive O(nd) decision paid only at each sender’s first appearance.
+The assignment map grows by O(U ) entries over the future stream.
+    This temporal split is used as a robustness check rather than a methodological
+novelty claim. A-TxAllo also uses a chronological 9:1 partition, carries the previous
+allocation forward, and explicitly places new nodes using newly committed
+transactions [?]. The evaluation in this paper instead uses four fixed history
+horizons, pins each sender at its first appearance, and evaluates retrieval together
+with interaction cut and load. For fairness, every fixed-horizon replay baseline
+carries its history assignment forward and assigns each unseen sender once using
+that baseline’s rule; the assignment is then pinned. The replay allocator is a
+related heuristic rather than the static graph objective: its graph term is replaced
+by one currently placed receiver indicator.
+
+
+4     Experimental Setup
+
+This section describes the traces and feature construction, the compared schemes
+and execution settings, and the evaluation metrics and chronological protocol.
+
+
+4.1   Traces and Feature Construction
+
+Table ?? summarises three Ethereum mainnet traces covering eight ERC-20
+contracts and one held-out BNB Smart Chain (BSC) trace with a disjoint set
+of eight tokens. D1–D3 include only direct transfer(address,uint256) calls.
+Therefore, the outer signer is both the debited token owner and the actual account-
+nonce owner. Observed signer nonces are rank-normalised per sender without
+changing their relative order. Because other account transactions are absent, this
+models the collected direct-transfer stream, not the complete Ethereum mempool.
+The traces cover non-overlapping spans on 14, 13, and 7 August 2026, with D3
+separated from the others by one week. D1 contains documented collection gaps,
+while D2, D3, and C1 scan their full stated spans.
+    Selector, calldata, and nonce semantics are common to both chains. C1 is
+challenging for semantic placement because one token accounts for 94.9% of
+                           ALPS: Admissible Locality and Payload Semantics           11
+
+Table 1. Measured traces. Blocks/span shows represented blocks over the inclusive
+height span. D1 has documented gaps; D2, D3, and C1 cover their full spans. Top token
+is the share of the most frequent contract; Multi-tok. is the share of calls/events from
+repeat senders active in multiple tokens.
+
+Trace              Chain Calls/events Blocks/span Senders Top token Multi-tok.
+Direct calls (D1) ETH            34,326      513/714    18,747       69.7%       19.5%
+Prior-day (D2) ETH               39,425      713/714    20,719       70.0%       20.9%
+Prior-week (D3) ETH              45,893      499/500    27,963       72.7%       19.9%
+Cross-chain (C1) BSC             25,728    2489/2500    14,082       94.9%       10.3%
+Transfer logs     ETH            17,445       81/137     7,195           —           —
+
+
+
+
+submitted calls, compared with 69.7–72.7% on Ethereum. A secondary Transfer-
+log trace extends the balance-locality population but cannot identify outer
+signers for router-mediated calls. It is therefore excluded from nonce-related
+claims. Artifact manifests provide block ranges, chain IDs, contract addresses,
+filters, hashes, RPC endpoints, and provenance.
+
+    Collection uses public JSON-RPC endpoints. Complete-scan collectors retain
+transaction hashes and stop if a block is missing. Eleven self-transfers are excluded
+from the log trace, leaving 17,445 evaluated events in Table ??. Direct-call
+collection requires a listed token target, the standard selector, nonzero decodable
+calldata, and a non-self recipient; router/proxy calls are excluded and duplicate
+sender nonces are removed during loading. Receipts were not queried, so submitted
+calls that later reverted are not distinguished. Accordingly, D1–D3 and C1 are
+submitted direct-call workloads, and “call” does not assert a successful token
+state transition; reverted submissions may still consume a nonce and influence
+locality metrics.
+
+    Raw ERC-20 values are not directly comparable across token decimals and
+price scales. For each token, the raw value is divided by its trace median, clipped
+to [0.1, 20], and used in the balance stress model. Clustering features combine a
+scaled exact token one-hot vector with log(1+relativeAmount). No Gaussian jitter
+or synthetic clustering coordinate is used. Therefore, when transaction k-means
+splits a dominant token, the split is based on an observed amount difference.
+For static allocation, token medians are fitted on the complete allocation trace.
+For each fixed-horizon temporal split, token medians are instead fitted on the
+earliest 50% prefix and frozen for all history and suffix transactions; thus no suffix
+amount contributes to temporal feature scaling. This common prefix scale keeps
+feature dimensions comparable across the reported 50–80% history fractions. The
+temporal horizon remains an explicit planning assumption and is varied around the
+observed suffix length in a separate sensitivity experiment. A production streaming
+allocator would require online statistic maintenance and an independently chosen
+planning horizon.
+12      Anonymous Author(s)
+
+Table 2. Design properties of the compared methods. Local denotes sender/guarded-
+state locality; Cap denotes a hard static historical-load constraint; Coord denotes
+coordination beyond the independent barrier.
+
+                Method                Local Sem. Cut Cap       Coord.
+                ADDR-MOD               Yes    No    No No    No
+                TX-KMEANS              No     Yes   No No   Retry
+                SENDER-KMEANS          Yes    Yes   No No    No
+                S-KM-BAL               Yes    Yes   No Yes   No
+                METIS                  Yes    No    Yes No   No
+                TXALLO                 Yes    No    Yes No Protocol
+                ALPS                   Yes    Yes   Yes Yes  No
+
+
+
+4.2   Schemes and Execution
+
+The main static evaluation compares all methods except METIS and TXALLO.
+ADDR-MOD uses a mod n, TX-KMEANS clusters individual transactions, and
+the sender-based variants cluster mean features of active senders. S-KM-BAL
+additionally uses the 1.15× historical-load target, while ALPS uses the joint
+objective described in Section ??. Section ?? separately compares METIS and
+TXALLO.
+    The evaluation varies n ∈ {2, 3, 4, 6, 8, 11} with a regional block capacity of 250.
+For the global nonce experiment, each (account, token) debit key is funded with
+its complete observed outgoing amount plus a cushion of one normalised balance
+unit. Therefore, both sequential execution and any correct retrying schedule can
+commit the full trace. Extra rounds reflect ordering and partitioning effects rather
+than arbitrary balance failures. Each regional mempool selects currently ready
+sender/nonce entries, commits up to capacity, retains future-nonce transactions,
+and retries them after the barrier.
+    The complete static sweep uses deterministic seed 0 with k-means n init=10.
+The temporal, frontier/ablation, and TxAllo comparisons use three initialisations.
+Allocation-sensitive conclusions are therefore reported from these sensitivity runs
+as well as the exact static audit. The capacity and allocator-runtime audits use
+five fresh initialisations.
+    For the balance-safety experiment, each observed (account, token) key instead
+receives the same stress balance, varied over {1000, 600, 400, 250, 150, 100, 60}.
+Account nonces are ignored only in this experiment to expose simultaneous
+guarded-key debits. A negative balance after the synthetic additive merge is
+an exact balance-safety witness for that run, not a reconstruction of historical
+execution; token balances are never pooled across contracts.
+    State and scheduling experiments set proof-of-work difficulty to zero. The
+evaluation reports barrier rounds and the schedule-level commit rate, Qs = Nc /R,
+where Nc is the number of committed transactions and R is the number of
+rounds. This is not machine-dependent wall-clock TPS. With regional capacity
+B, Qs /(nB) represents schedule utilisation and isolates dependency stalls from
+                          ALPS: Admissible Locality and Payload Semantics           13
+
+hashing, storage, networking, and consensus. The simulator retains a genuine
+SHA-256 path for separate benchmarking, but no wall-clock claim depends on it.
+
+
+4.3   Metrics and Temporal Protocol
+
+The evaluation reports split senders and guarded keys, transactions issued by
+split senders, barrier rounds, deferred nonce checks, maximum-to-mean regional
+load, and the active-account interaction cut. For a given allocation, let Tact be
+submitted calls whose receiver also appears as an active sender. The interaction
+cut is
+                          |{t ∈ Tact : zsender(t) ̸= zreceiver(t) }|
+                     X=                                              ,
+                                           |Tact |
+
+and interaction coverage is |Tact |/|T |. Receiver-only addresses are therefore ex-
+cluded from the cut rather than automatically counted as cross-region. Regional
+load is reported as maxr Lr /L̄. For semantic retrieval locality, regions are ranked
+for each token by that token’s call/event count; R90 is the number of highest-
+ranked regions required to cover at least 90% of that token’s calls/events, aver-
+aged over the evaluated tokens. Thus, lower R90 means fewer regions need to
+be scanned, not lower measured query latency. A complementary in-memory
+benchmark materialises each region as a category array and distinguishes three
+query semantics. Oracle-90 ranks regions using the evaluated records and scans
+the minimum prefix covering at least 90%; it is an approximate, in-sample di-
+agnostic and intentionally omits the remaining records. History-90 learns each
+token’s ranking and prefix length on the first 70% of the chronological trace,
+freezes that plan, and reports achieved recall on the final 30%. Complete scans
+all regions and returns every match. Allocations remain the static full-trace
+allocations used in the head-to-head comparison, so History-90 tests the query
+planner, not out-of-sample allocator fitting. After warm-up, 250 repetitions per
+token record contacted regions, examined rows, result recall, median latency, and
+latency interquartile range. This isolates allocation-induced scan work; it does
+not model an index, network delay, or a distributed storage engine.
+    Static interaction coverage depends only on the trace and is therefore strategy-
+invariant: 53.8% for D1, 56.6% for D2, 60.6% for D3, and 45.7% for C1. This
+conditional metric matches ALPS’s active-sender graph while keeping the denom-
+inator explicit.
+    The fixed-horizon chronological replay uses n = 6, history fractions {0.5, 0.6, 0.7, 0.8},
+and three k-means initialisations, giving 12 history/future configurations per
+method. Figures report the mean and standard deviation across these config-
+urations as sensitivity summaries rather than as independent repeated chain
+samples. Across the four traces, 60.0% of future transactions come from senders
+absent from the training prefix, making cold-start handling important. At history
+fraction 0.7, a separate ALPS sensitivity sets Hf /|Tf | ∈ {0.5, 1, 1.5, 2} on every
+direct-call trace and seed.
+14      Anonymous Author(s)
+
+5     Performance Evaluation
+The evaluation examines safety, retry cost, locality, temporal robustness, compo-
+nent effects, and comparison with TxAllo. The headline parameters use λg = 0.15
+and α = 1.15, selected using D1 as the development trace and then held fixed;
+D2, D3, and C1 provide parameter-holdout checks on temporally distinct traces.
+Each static allocation is nevertheless fitted and scored on the same trace, so these
+are not out-of-sample allocation tests. The static and head-to-head evaluations
+cover all six region counts, while the stress, temporal, and mechanism analyses
+use n = 6. The operating frontier varies only λg , and each ablation removes one
+component at a time. Overall, the static sweep contains 120 trace/region/scheme
+measurements, and the balance-stress experiment contains 175 measurements
+(140 sender-local and 35 TX-KMEANS).
+
+5.1   Admissibility under Payload Partitioning
+TX-KMEANS violates sender locality on every trace and, at larger region counts,
+also violates guarded-key locality. Across the 96 sender-local measurements—
+ADDR-MOD, both sender k-means variants, and ALPS over four traces and six
+region counts—the number of split guarded keys, split senders, and overdrawn
+accounts is exactly zero, and every execution commits the complete trace. In
+contrast, TX-KMEANS splits 66–1,592 senders and up to 1,334 guarded keys.
+Across the four traces and region counts, transactions issued by split senders
+account for 10.3–44.4% of the corresponding trace (Fig. ??(a)). Table ?? reports
+the detailed results for n = 6.
+    The distinction between guarded-key locality and sender locality is clear
+at n = 2. Across all four traces, TX-KMEANS splits no guarded keys but
+still splits 66–551 senders. With two regions, clustering places complete token
+populations on each side, so every (account, token) balance remains region-local
+and balance safety is preserved. However, accounts that transact across multiple
+tokens can still be divided between regions, creating cross-region dependencies
+for the account-wide nonce. This result directly shows the difference between
+guarded-key locality and sender locality and is visible because balances are
+modelled separately for each token.
+    The balance-stress experiment further confirms this behaviour. Across 175
+measurements—five traces, seven starting balances, and five schemes—TX-
+KMEANS overdraws 6–48 unique accounts in each of its 35 rows, while all
+140 sender-local rows record zero overdraws. The lowest-balance tail is non-
+monotone because tighter balances can cause regional transfers to fail before
+two conflicting debits are both accepted and merged. Therefore, the number of
+witnesses is not expected to increase monotonically.
+
+5.2   Retry Cost of Sender Fragmentation
+Deferring and retrying future-nonce transactions restores eventual commit, but
+it does not remove the scheduling cost. Every scheme commits 100% of every
+                           ALPS: Admissible Locality and Payload Semantics           15
+
+Table 3. Results at n = 6 for all direct-call traces. Split keys are guarded
+(account, token) keys. An overdrawn account is a unique account with at least one
+negative guarded key; ranges span the seven-level balance stress. Lower is better except
+Qs .
+
+            Method         Split Rounds    Qs Overdrawn R90 Load Active cut
+                           keys                   accts.          (fraction)
+            D1 ETH 08-14
+             ADDR-MOD      0          33 1,040         0 5.88   1.43    .837
+             TX-KMEANS 1,021       1,068    32     19–48 1.38   2.27    .425
+             S-KM-BAL      0          27 1,271         0 2.25   1.15    .646
+             ALPS          0          27 1,271         0 3.00   1.15    .260
+            D2 ETH 08-13
+             ADDR-MOD      0          37 1,066         0 5.88   1.39    .841
+             TX-KMEANS 1,061       1,388    28     20–48 1.38   2.28    .432
+             S-KM-BAL      0          31 1,272         0 2.38   1.15    .670
+             ALPS          0          31 1,272         0 2.88   1.15    .279
+            D3 ETH 08-07
+             ADDR-MOD      0         38 1,208          0 5.50   1.22    .834
+             TX-KMEANS 1,067        843    54      12–36 1.38   2.08    .614
+             S-KM-BAL      0         36 1,275          0 3.12   1.15    .818
+             ALPS          0         36 1,275          0 2.88   1.15    .528
+            C1 BSC
+              ADDR-MOD         0     21 1,225          0 4.62   1.21    .837
+              TX-KMEANS      478    448    57      13–34 1.25   2.93    .413
+              S-KM-BAL         0     20 1,286          0 2.62   1.15    .859
+              ALPS             0     19 1,354          0 2.00   1.07    .236
+
+
+
+
+trace with no pending transactions once future nonces are retried. However,
+TX-KMEANS requires 156–1,760 rounds, compared with 11–106 for ALPS, and
+performs up to 3.13 million future-nonce checks. Its schedule-level commit rate,
+Qs , falls to 22–253 committed transactions per round, compared with 432–2,338
+for ALPS.
+    At n = 6, TX-KMEANS requires approximately 40×, 45×, 24×, and 24× as
+many barrier rounds as ALPS on D1, D2, D3, and C1, respectively (Fig. ??(b),
+Table ??). This comparison isolates the scheduling penalty caused by splitting
+nonce-ordered senders; it is not a speedup over the strongest admissible alternative.
+ALPS and balanced sender k-means both take 27 rounds on D1. Among sender-
+local allocators, ALPS’s claim is improved retrieval and interaction locality
+subject to the same load constraint, with an explicit trade-off between those
+locality objectives.
+
+
+5.3   Locality and Load Trade-offs
+
+Relative to ADDR-MOD, enforcing sender locality does not prevent ALPS from
+improving both locality metrics on these traces; the additional cost is allocator
+computation (Section ??). ALPS improves both locality metrics over ADDR-
+MOD in all 24 trace/region settings. R90 decreases by 18.8–68.5% (mean 45.9%),
+while the interaction cut decreases by 35.2–75.9% (mean 57.7%), with static load
+never exceeding the 1.15 target.
+16      Anonymous Author(s)
+
+                                                                           (a) Nonce-locality exposure, TX-KMEANS                                                                                        (b) Retry-aware scheduling cost
+                                                   100
+
+
+                                                                                                                                                                                103
+
+
+
+
+               Transactions of split senders (%)
+
+
+
+
+                                                                                                                                              Rounds to commit the full trace
+                                                    80
+
+
+
+                                                    60                                                                                                                                                                                               D1 ETH 08-14
+                                                                                                                                                                                                                                                     D2 ETH 08-13
+                                                                                                                                                                                                                                                     D3 ETH 08-07
+                                                    40                                                                                                                          102                                                                  C1 BSC
+                                                                                                                                                                                                                                                     ALPS (all traces)
+
+                                                                                                                     D1 ETH 08-14
+                                                    20                                                               D2 ETH 08-13
+                                                                                                                     D3 ETH 08-07
+                                                                                                                     C1 BSC
+                                                                                                                     all sender-local (0%)
+                                                       0                                                                                                                        101
+                                                               2       3           4            6             8                       11                                              2     3        4                 6              8                            11
+                                                                                           Number of regions n                                                                                                Number of regions n
+
+
+
+
+Fig. 2. Locality violations and retry-aware scheduling cost across the four direct-call
+traces. Sender-local schemes have zero split-sender exposure in (a), while (b) compares
+TX-KMEANS and ALPS round counts.
+
+
+                                                                                   ADDR-MOD (base)         TX-KMEANS (payload)           SENDER-KMEANS                                          SENDER-KMEANS-BAL              ALPS (ours)
+
+                                                                       D1 ETH 08-14                               D2 ETH 08-13                                                            D3 ETH 08-07                                    C1 BSC
+
+
+                                                   8
+               Regions for 90%
+
+
+
+
+                                                   6
+
+
+                                                   4
+
+
+                                                   2
+
+
+                                                           2       4       6           8         11    2      4       6        8             11                                  2    4      6           8        11       2      4          6          8           11
+                                                                               n                                          n                                                                      n                                               n
+
+
+
+
+Fig. 3. Semantic retrieval cost across all direct-call traces. TX-KMEANS is an infeasible,
+capacity-unconstrained comparator that violates sender locality; the other methods are
+sender-local.
+
+
+
+
+    A more informative comparison is with balanced sender k-means, which
+is already admissible. ALPS reduces the interaction cut in all 24 settings by
+12.8–82.5% (mean 50.9%). It also improves R90 in 19 settings, ties in two, and
+regresses in three. These three retrieval-locality trade-offs occur at n = 6 on
+D1 and D2 and at n = 4 on D3; only the D1 case is on the development trace
+used for parameter selection. We therefore report these exceptions explicitly
+rather than claiming universal dominance. In most settings, ALPS provides a
+strict improvement; otherwise, the break-even ratio κ⋆ identifies when the simpler
+scheme is preferable under the score in (??). For the D1 n = 6 setting, κ⋆ = 1.94:
+weights above this value favour ALPS because they place greater relative penalty
+on interaction cut, whereas smaller weights favour SENDER-KMEANS-BAL.
+At higher region counts, ALPS often weakly dominates, making the threshold
+non-positive.
+   Figure ?? shows why these exceptions are limited to small n. The retrieval cost
+of ADDR-MOD increases sharply with the number of regions, giving semantic
+partitioning more room for improvement. At n = 11, ALPS improves R90 over
+balanced sender k-means by 10.0–37.8% across all four traces. Unconstrained
+SENDER-KMEANS achieves strong semantic locality but becomes highly imbal-
+anced, reaching a load of 4.45 at n = 11. In contrast, the capacity-aware schemes
+never exceed 1.15.
+                            ALPS: Admissible Locality and Payload Semantics        17
+
+Table 4. Declared-horizon sensitivity at n = 6 and history fraction 0.7. Means cover
+four traces and three initialisations; lower is better.
+
+                   Hf /|Tf |   R90     Active cut   Max/mean load
+                      0.5      2.802      .656          1.260
+                      1.0      2.573      .615          1.426
+                      1.5      2.573      .581          1.724
+                      2.0      2.573      .552          1.858
+
+
+
+5.4   Fixed-Horizon Replay Robustness
+
+
+The fixed-horizon replay preserves sender locality by construction because each
+unseen sender is assigned once and pinned; it is an invariant, not a differentiating
+chronological-performance metric.
+     Compared with balanced sender k-means, ALPS reduces the conditional
+future interaction cut among transactions whose receiver is already placed by
+19.3%, 23.7%, 37.9%, and 14.1% on D1, D2, D3, and C1, respectively, while also
+lowering the observed load (Fig. ??). Retrieval shows a mixed result: R90 is 4.8%
+and 8.0% higher on D1 and D2, nearly unchanged on D3, and 30.3% lower on
+C1. Unconstrained SENDER-KMEANS achieves lower interaction cuts on D3
+and C1 (.327 and .576, compared with .513 and .745 for ALPS), but with much
+higher loads of 3.68 and 2.58, compared with 1.48 and 1.43 for ALPS.
+     C1 shows the weakest conditional interaction-cut improvement. ALPS im-
+proves over hashing by 11.9% on C1, compared with 28.8–38.7% on the Ethereum
+traces. One token accounts for 94.9% of C1 submitted calls, and 62.2% of future
+traffic comes from unseen senders. As a result, first-transaction payloads provide
+limited information for distinguishing accounts. Sender pinning still preserves
+safety. The fixed-horizon allocator uses a 1.15 target both to filter feasible regions
+when a sender first appears and to scale its load cost, but it does not impose a
+lifetime hard cap; pinned-sender activity can therefore drive observed future load
+above 1.15.
+     The causal interaction cut includes only receiver placements available at
+the time of arrival, giving coverage of 26.4–44.3% across the traces. Unplaced
+receivers are reported separately. Overall, 60.0% of future traffic comes from
+unseen senders, which explains much of the gap between static and chronological
+performance.
+     Table ?? reports the declared-horizon sensitivity. Values are descriptive means
+over four traces and three initialisations. Halving the horizon raises R90 by 8.9%
+and the cut by 6.6% relative to the observed-suffix horizon, while reducing load
+imbalance by 11.6%. Increasing the horizon to 1.5× or 2× leaves mean R90
+unchanged and reduces the cut by 5.6% or 10.3%, but raises imbalance by 20.9%
+or 30.3%. Thus Hf controls an interaction–load trade-off rather than being an
+innocuous look-ahead constant.
+18      Anonymous Author(s)
+
+                                                                                                             HASH        S-KM        S-KM-B         ALPS
+
+                                                 (a) Semantic retrieval                                                  (b) Interaction cut                                                (c) Load balance
+
+                                                                                                                                                                                 3.5
+                                        5                                                               80
+
+
+
+
+              Regions scanned for 90%
+                                                                                                                                                                                 3.0
+
+
+
+
+                                                                               Active-account cut (%)
+
+
+
+
+                                                                                                                                                           Maximum / mean load
+                                        4
+                                                                                                        60                                                                       2.5
+
+                                        3                                                                                                                                        2.0
+                                                                                                        40
+                                                                                                                                                                                 1.5
+                                        2
+                                                                                                                                                                                 1.0
+                                                                                                        20
+                                        1
+                                                                                                                                                                                 0.5
+
+                                        0                                                               0                                                                        0.0
+                                            D1       D2         D3        C1                                        D1     D2         D3       C1                                      D1    D2        D3      C1
+
+
+
+
+Fig. 4. Fixed-horizon chronological replay at n = 6. Bars show means over four history
+fractions and three initialisations; error bars show standard deviations. S-KM and
+S-KM-B denote sender k-means and its balanced variant.
+
+
+5.5   Component Analysis and Allocator Overhead
+
+The same component effects appear across all four traces. Removing the semantic
+term degrades retrieval locality: R90 is 5.00, 5.25, 4.88, and 4.12 on D1, D2,
+D3, and C1, respectively, versus address hashing’s 5.88, 5.88, 5.50, and 4.62.
+The interaction cut decreases as expected. Removing the capacity cap increases
+load to 1.28–1.52, exceeding the measured 1.15 maximum-imbalance target.
+Setting λg = 0 removes the interaction term and produces a semantic-plus-load
+ALPS variant. This variant is close to, but not identical to, balanced sender
+k-means because ALPS uses transaction-weighted prototypes and exact objective
+refinement. Comparing it with positive graph weights isolates the effect of the
+interaction term without assuming algebraic equivalence to that baseline.
+    Figure ?? shows the operating curve for each trace. The fixed λg = 0.15 lies
+in the low-cut region of every measured curve, although no universal knee is
+claimed. C1 begins to flatten earlier than the three Ethereum traces. Beyond
+0.35, the curve may flatten or reverse, which is consistent with the non-convex
+discrete search.
+    A five-seed audit varies α ∈ {1.05, 1.10, 1.15, 1.25, 1.50} at six regions on all
+four traces. No run relaxes its requested cap. Moving from 1.05 to 1.15 lowers cut
+on every trace; larger values give trace-dependent, non-monotone changes. Error
+intervals in the artifact quantify initialisation, not workload-sampling, variability.
+    Allocator overhead remains modest at the measured scale. On D1 prefixes
+of 5,000, 10,000, 20,000, and 34,326 calls, fresh single-worker runs over three
+seeds require median profile-plus-allocation times of 2.50, 5.32, 8.08, and 12.60 s,
+respectively, on an Intel i9-14900. At the full trace, with 18,747 active senders and
+16,120 interaction edges, the peak process working set is 248.4 MiB, and no run
+relaxes the capacity bound. These measurements represent allocator overhead,
+not production TPS.
+    A separate five-seed, fresh-process comparison at six regions gives tracewise
+median ranges of < 0.01 s (ADDR-MOD), 0.16–0.26 s (TX-KMEANS), 0.29–
+0.68 s (S-KM-BAL), 0.13–0.28 s (METIS), 4.17–6.88 s (TxAllo), and 10.99–
+15.74 s (ALPS). CSV loading is excluded; required profile or graph construction
+is included.
+                                                                         ALPS: Admissible Locality and Payload Semantics                                                  19
+
+                                                                                                           0
+                                                                                                                                                      D1 ETH 08-14
+                                                           0                                                                                          D2 ETH 08-13
+
+
+
+
+          Active-account interaction cut (%)
+                                               70                                                0                                                    D3 ETH 08-07
+                                                                                                      0                                               C1 BSC
+
+                                               60                                                          0.05
+                                                                                                           0.08
+                                                                                                           0.15
+                                                                                                                        0.05                        0.35          0.6
+
+                                               50
+                                                                                                                             0.05
+                                                                                                               0.08
+
+                                               40
+                                                                                                                      0.08
+
+
+
+                                               30
+                                                    0.05                                                                              0.15
+                                                                                                                                                                    0.6
+                                                                                                                                                                  0.35
+
+                                                                     0.08               0.35                                   0.15
+                                                                     0.15                      0.6                                               0.6 0.35
+
+                                                                            2.0                2.5                           3.0                            3.5
+                                                                            Regions scanned for 90% of a token (R90)
+
+Fig. 5. ALPS retrieval–interaction trade-off across all direct-call traces. Point labels
+give λg and the fixed 0.15 point is circled; lower values are better on both axes.
+
+Table 5. Head-to-head allocation results at the two reported region counts. Entries are
+three-seed means. R is R90 , X is active-account interaction cut, and L is maximum-to-
+mean load; lower is better.
+
+                                                                             ALPS               METIS-SENDER                                      TxAllo
+                                               Trace           n     R       X    L             R   X    L                                   R     X     L
+                                                D1              6   3.04     .263   1.150      4.67       .083        1.000             4.92       .119       1.010
+                                                D1             11   2.88     .314   1.135      8.08       .122        1.030             7.33       .166       1.156
+                                                D2              6   2.96     .246   1.123      4.62       .092        1.000             5.00       .125       1.008
+                                                D2             11   3.75     .320   1.147      7.75       .134        1.030             7.50       .186       1.206
+                                                D3              6   2.88     .524   1.150      5.04       .235        1.001             4.75       .156       1.106
+                                                D3             11   3.83     .444   1.150      7.62       .295        1.058             7.75       .211       1.665
+                                                C1              6   2.00     .236   1.073      3.88       .152        1.000             3.62       .197       1.008
+                                                C1             11   3.25     .349   1.150      5.62       .215        1.049             5.71       .253       1.177
+
+
+
+
+5.6   Comparison with Graph Partitioning and TxAllo
+
+Sender-weighted METIS records zero splits in all 72 runs. Across all 24 trace/region
+settings, ALPS lowers its R90 by 18.2–64.4% (mean 39.4%), whereas METIS
+achieves a 32.9–91.1% lower interaction cut than ALPS (mean 63.4%) and reaches
+a maximum load of 1.058. Thus graph cut optimises interaction locality but does
+not optimise semantic retrieval locality. This trade-off arises because METIS
+operates on account-interaction topology, whereas R90 depends on token-specific
+retrieval concentration.
+    The closest algorithmic comparison is the TxAllo allocation objective [?],
+which allocates accounts using community detection and jointly optimises cross-
+shard traffic and workload balance. This paper reimplements its allocation objec-
+tive using Louvain initialisation, candidate-community moves, and coordinate
+descent on its throughput score. For shard r, the implementation forms workload
+20      Anonymous Author(s)
+
+σr from local transaction count plus (η − 1) times each incident cross-shard
+edge weight and greedily moves an account only to a neighbouring community’s
+shard when this strictly lowers maxr σr ; ties keep the current shard. It uses
+η = 2, at most eight sweeps, and stops when a sweep accepts no move. Pro-
+tocol components, including consensus, settlement, brokers, and the A-TxAllo
+epoch update, are excluded because they change the execution semantics. The
+comparison therefore evaluates allocation objectives under the same execution
+model rather than deployed throughput, using η = 2, eight coordinate sweeps,
+and three-seed means over eight trace/region settings.
+    The reimplementation is account-keyed and records zero split senders and
+guarded keys in all eight trace/region settings. Thus, this independently designed
+workload-aware allocator also satisfies the locality requirement described in
+Section ??. The two methods favour different objectives. Relative to ALPS, the
+reimplemented objective reduces the active-account cut in all eight trace/region
+settings by 13.5–79.2% (mean 50.6%). In contrast, ALPS reduces R90 in all
+eight trace/region settings by 40.5–60.8% (mean 47.3%). These results expose
+an objective trade-off: the reimplementation assigns greater relative emphasis to
+active-account cross-region interaction, whereas ALPS explicitly includes retrieval
+locality through R90 . At n = 11, the reimplementation also permits loads of
+1.16–1.67, whereas static ALPS maintains its effective load constraint at or below
+1.15.
+    The trade-off can be made operational. Consider one submitted transaction
+and q token queries drawn uniformly over the evaluated token categories, matching
+the unweighted per-token mean in R90 . Let cq be the cost of one region scan, cx
+the cost of one cross-region active-account interaction, p the trace’s interaction
+coverage, and X the cut conditional on that eligible population. Expected cost
+per submitted transaction, in the chosen common cost unit, is
+
+                              C = qcq R90 + pcx X.
+                                                                              METIS
+Relative to METIS, ALPS is cheaper when qcq /cx > p(XALPS −XMETIS )/(R90            −
+  ALPS
+R90 ); using the measured p = 0.457–0.606, the threshold is 0.020–0.081 across
+Table ??. Against TxAllo it is 0.011–0.119. Deployments below these query-to-
+interaction cost ratios should prefer the graph-oriented allocator; deployments
+above them favour ALPS. A deployment with a frequency-weighted query mix
+should replace R90 by the corresponding weighted mean. This states the work-
+load population and where semantic locality pays for its higher cut rather than
+claiming universal dominance.
+    The direct query microbenchmark in Table ?? supports the scan side of this
+model. Across four traces, three seeds, and all tokens, ALPS contacts 40.5% fewer
+regions and examines 43.1% fewer rows than TxAllo. Mean per-token median
+latency is 27.6% lower overall and lower on three of four traces; D1 is 3.0% slower.
+These microsecond timings concern the stated in-memory scan only and are not
+end-to-end distributed-query latency.
+    A one-factor sensitivity analysis at n = 6 varies η ∈ {1.25, 1.5, 2, 3, 4} with
+eight sweeps and varies the sweep cap over {4, 8, 16, 32} with η = 2, across four
+                          ALPS: Admissible Locality and Payload Semantics          21
+
+Table 6. Six-region in-memory token-query benchmark. Values average per-token
+measurements over four traces and three seeds.
+
+                   Method Regions Rows scanned Median µs
+                   TxAllo        4.57         28,088         6.97
+                   ALPS          2.72         15,991         5.05
+
+
+
+traces and three seeds. ALPS retains lower R90 in all 12 trace/seed configurations
+for every value of η. The reimplementation retains the lower interaction cut in
+all 12 trace/seed configurations through η = 3 and in 10 of 12 configurations at
+η = 4. It exceeds the 1.15 load target once at each of η = 3 and η = 4. All four
+sweep caps produce identical metrics, indicating convergence within four sweeps
+in these settings.
+
+
+6    Conclusion and Future Work
+For the concurrent same-snapshot additive-merge model, guarded-key locality
+is necessary and sufficient for balance non-negativity; the result does not claim
+full Ethereum validity or apply to coordinated execution. Sender locality adds
+account-nonce order for the evaluated direct calls. The large round-count gap
+to transaction clustering measures the cost of sender fragmentation, while the
+comparison among admissible allocators exposes the actual ALPS trade-off: better
+semantic retrieval locality in exchange for more interaction cut and allocator
+time. A query-cost threshold states when that exchange is favourable, and the
+in-memory benchmark confirms lower contacted-region and row-scan work.
+    Static experiments fit token medians on the complete allocation trace. The
+chronological replay instead fits them on the earliest 50% prefix and freezes
+them for all later transactions, removing suffix leakage; its declared horizon still
+trades interaction cut against realised load and provides no lifetime cap. The
+evidence remains limited to short submitted-call workloads from two EVM chains.
+Direct calls exclude routers and other nonce-consuming transactions, receipts
+and historical balances are not reconstructed, and the query benchmark does not
+emulate distributed storage. TxAllo covers its allocation objective, not its protocol,
+while barrier rounds measure scheduling efficiency rather than production TPS.
+Future work will add receipt-aware archive replay, diverse read/write sets, indexed
+distributed retrieval, migration, and protocol integration.
+

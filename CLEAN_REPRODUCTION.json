@@ -1,0 +1,42 @@
+{
+  "status": "passed",
+  "date": "2026-10-17",
+  "core_environment": {
+    "python": "3.13.7",
+    "packages": {
+      "numpy": "2.4.2",
+      "pandas": "3.0.1",
+      "scikit-learn": "1.8.0",
+      "scipy": "1.17.1",
+      "matplotlib": "3.10.8",
+      "networkx": "3.6.1",
+      "pypdf": "6.21.0"
+    }
+  },
+  "metis_environment": {
+    "python": "3.12.15",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "matplotlib": "3.11.2",
+      "networkx": "3.7",
+      "pymetis": "2025.2.2",
+      "pypdf": "6.20.1"
+    }
+  },
+  "checks": [
+    "Equation (1) semantic scale: all initial sender/prototype pairs, computed once",
+    "15 unit tests",
+    "Tables II-III: all 150 static rows and 48 horizon rows",
+    "Table IV: all 360 head-to-head configurations (timings excluded)",
+    "Table V and experimental Figures 2-4: all 1,140 benchmark and 2,604 frontier rows; plots regenerated",
+    "all 48 prospective allocations and 2,688 query rows",
+    "all 36 graph-weight allocations and 2,016 query rows",
+    "100 cached BSC receipts"
+  ],
+  "scientific_fields": "exact match",
+  "timing_comparison": "excluded",
+  "scope": "fresh core venv plus fresh Conda METIS environment; extracted anonymous artifact; local independent rerun, not third-party audit"
+}

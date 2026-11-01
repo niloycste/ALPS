@@ -50,7 +50,8 @@ DIRECT = {
 LOG = {"eth_logs": "data/eth_all.csv"}
 
 BALANCES = [1000.0, 600.0, 400.0, 250.0, 150.0, 100.0, 60.0]
-STAGES = ("static", "headroom", "population", "temporal", "tempsens", "analysis")
+STAGES = ("static", "headroom", "population", "temporal", "tempsens",
+          "horizon", "analysis")
 LOG_STAGES = ("static", "headroom")
 
 
@@ -92,6 +93,7 @@ def run_one(tag: str, path: str, is_log: bool, stages) -> dict:
     stage("population", lambda: R.conflict_sweep(path))
     stage("temporal", lambda: R.temporal(path))
     stage("tempsens", lambda: R.temporal_sensitivity(path))
+    stage("horizon", lambda: R.temporal_horizon_sensitivity(path))
     stage("analysis", lambda: R.alps_analysis(path))
 
     print(f"  [{tag}] complete in {time.perf_counter()-t0:.0f}s", flush=True)

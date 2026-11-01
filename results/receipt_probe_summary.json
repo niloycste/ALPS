@@ -1,0 +1,32 @@
+{
+  "limit_per_trace": 1,
+  "sample_seed": 0,
+  "traces": [
+    {
+      "trace": "eth_aug13",
+      "population": 39425,
+      "selected": 1,
+      "selection": "uniform_without_replacement",
+      "seed": 0,
+      "input_sha256": "bc37c9f406df236df9bb5f4ee8e38927de7d002f7a24c5a422906c6d9748e0e5",
+      "classifications": {
+        "unavailable": 1
+      },
+      "rpc_error": "RuntimeError: RPC returned null: historical record unavailable"
+    },
+    {
+      "trace": "bsc",
+      "population": 25728,
+      "selected": 1,
+      "selection": "uniform_without_replacement",
+      "seed": 0,
+      "input_sha256": "eae06dc890f406e23dec365c95a8dcb46391536ee778635fa8c9a55c2b1358de",
+      "classifications": {
+        "unavailable": 1
+      },
+      "rpc_error": "HTTPError: HTTP Error 403: Forbidden"
+    }
+  ],
+  "complete": false,
+  "interpretation": "exact event matching is a diagnostic; nonstandard token behaviour is not inferred"
+}

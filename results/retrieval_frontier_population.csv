@@ -1,0 +1,5 @@
+trace,total_categories,history_categories,suffix_categories,evaluated_categories,suffix_categories_without_history,history_categories_without_suffix,suffix_rows_without_history
+eth_aug14,8,8,8,8,0,0,0
+eth_aug13,8,8,8,8,0,0,0
+eth_aug07,8,8,8,8,0,0,0
+bsc,8,7,8,7,1,0,1
