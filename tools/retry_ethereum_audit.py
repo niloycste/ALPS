@@ -12,7 +12,7 @@ from pathlib import Path
 import random
 from collections import Counter
 
-from audit_receipts import ROOT, TRACES, RPC, classify, validate_transaction
+from tools.audit_receipts import ROOT, TRACES, RPC, classify, validate_transaction
 
 
 def audit_trace(trace, endpoint, timeout):

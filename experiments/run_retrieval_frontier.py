@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-from run_retrieval_benchmark import (
+from experiments.run_retrieval_benchmark import (
     TRACES, METHODS, SEEDS, N_REGIONS, HISTORY_FRACTION,
     NativeWorkload, STRATEGIES, counts_for, ranked_plan,
 )

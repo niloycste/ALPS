@@ -4,7 +4,7 @@ Head-to-head against a reimplemented TxAllo allocation objective.
 Runs ADDR-MOD, TXALLO, SENDER-KMEANS-BAL and ALPS on every direct-call trace
 at every region count, with all ALPS weights frozen at their D1 values.
 
-    python run_headtohead.py
+    python -m experiments.run_headtohead
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ from sim.partition import (
     sender_locality_violations,
 )
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 BLOCK = 250
 REGIONS = (2, 3, 4, 6, 8, 11)

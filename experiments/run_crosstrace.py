@@ -20,7 +20,7 @@ Two questions are answered separately.
            re-derived per trace, since the deployment rule in the paper depends
            on it.
 
-    python run_crosstrace.py --workers 4
+    python -m experiments.run_crosstrace --workers 4
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ from sim.partition import (
     sender_locality_violations,
 )
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 BLOCK = 250
 REGIONS = (6, 11)

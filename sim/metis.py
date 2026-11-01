@@ -80,7 +80,7 @@ def metis_sender(
     except ImportError as exc:
         raise RuntimeError(
             "METIS-SENDER requires the optional dependency 'pymetis'; "
-            "install requirements-metis.txt"
+            "install config/requirements-metis.txt"
         ) from exc
 
     options = pymetis.Options(seed=int(seed))

@@ -1,6 +1,6 @@
 """History-only allocation, features and query plans with causal suffix routing.
 
-Example: python run_prospective_retrieval.py
+Example: python -m experiments.run_prospective_retrieval
 Split runs: --methods ALPS,TXALLO,SENDER-KMEANS-BAL --output prospective_core
 Graph baselines use an explicitly adapted first-arrival rule, not A-TxAllo.
 """
@@ -21,7 +21,7 @@ import numpy as np
 from sim.chain import Transaction
 from sim.partition import STRATEGIES, sender_locality_violations
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 TRACES = {"eth_aug14": "native_all.csv", "eth_aug13": "native_day2.csv",
           "eth_aug07": "eth_week2.csv", "bsc": "bsc_trace.csv"}
 TARGETS = (.5, .7, .8, .9, .95, .99, 1.)

@@ -16,7 +16,7 @@ import random
 import time
 import urllib.request
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 TRACES = {"eth_aug14": ("native_all.csv", "https://ethereum-rpc.publicnode.com"),
           "eth_aug13": ("native_day2.csv", "https://ethereum-rpc.publicnode.com"),
           "eth_aug07": ("eth_week2.csv", "https://ethereum-rpc.publicnode.com"),

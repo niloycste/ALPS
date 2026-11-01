@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 from pypdf import PdfReader
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT.parent / "output/submission"
 
 
@@ -63,19 +63,18 @@ def main():
                  lambda m: m.group(1), tex, flags=re.S)
     assert not any(name in tex for name in identities)
     entries = {}
-    for p in sorted(ROOT.glob("*.py")):
-        entries[p.relative_to(ROOT).as_posix()] = p.read_bytes()
     for folder, suffixes in (("sim", {".py"}), ("tests", {".py"}),
+                             ("experiments", {".py"}), ("tools", {".py"}),
                              ("data", {".csv", ".json"}),
                              ("results", {".csv", ".png", ".svg", ".json", ".jsonl"})):
         for p in sorted((ROOT / folder).rglob("*")):
             if p.is_file() and p.suffix in suffixes:
                 entries[p.relative_to(ROOT).as_posix()] = p.read_bytes()
-    for name in ("README.md", "ARTIFACT_VERIFICATION.md", "NEW_VALIDATION_RESULTS.md",
-                 "REPRODUCE_CLEAN.md", "CLEAN_REPRODUCTION.json",
-                 "SEMANTIC_SCALE_VERIFICATION.json",
-                 "requirements.txt", "requirements-metis.txt",
-                 "requirements-core-lock.txt", "environment-metis-lock.yml"):
+    for name in ("README.md", "docs/ARTIFACT_VERIFICATION.md",
+                 "docs/NEW_VALIDATION_RESULTS.md", "docs/REPRODUCE_CLEAN.md",
+                 "docs/CLEAN_REPRODUCTION.json", "docs/SEMANTIC_SCALE_VERIFICATION.json",
+                 "config/requirements.txt", "config/requirements-metis.txt",
+                 "config/requirements-core-lock.txt", "config/environment-metis-lock.yml"):
         entries[name] = (ROOT / name).read_bytes()
     entries["ALPS_conference_submission/main.tex"] = tex.encode("utf-8")
     entries["ALPS_conference_submission/references.bib"] = texpath.with_name("references.bib").read_bytes()
@@ -95,7 +94,7 @@ def main():
         if Path(name).suffix in {".tex", ".md", ".py", ".bib", ".json", ".csv", ".txt"}:
             content = data.decode("utf-8-sig").lower()
             # This checking utility legitimately contains the scanner's patterns.
-            if name != Path(__file__).name:
+            if name != "tools/prepare_anonymous_artifact.py":
                 assert not any(x in content for x in forbidden), name
         if name.endswith(".pdf"):
             import io

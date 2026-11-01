@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "results"
 FIGURES = ROOT / "ALPS_conference_submission" / "figures"
 RECALL_LEVELS = (0.80, 0.85, 0.90, 0.95)

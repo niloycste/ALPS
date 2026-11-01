@@ -1,8 +1,8 @@
 """Run the manuscript artifact end to end and compare scientific outputs.
 
 Run this from an extracted anonymous artifact in a fresh environment containing
-requirements-metis.txt plus pypdf. Timing columns are excluded because they are
-environment dependent. The script writes CLEAN_REPRODUCTION.json.
+config/requirements-metis.txt plus pypdf. Timing columns are excluded because
+they are environment dependent. The script writes docs/CLEAN_REPRODUCTION.json.
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ import sys
 
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "results"
 ENV = dict(os.environ, OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1")
 
@@ -56,7 +56,7 @@ def main():
                         help="Python from a second fresh environment containing PyMetis")
     args = parser.parse_args()
     checks = []
-    run(sys.executable, "verify_semantic_scale.py")
+    run(sys.executable, "-m", "tools.verification.verify_semantic_scale")
     checks.append("Equation (1) semantic scale: all initial sender/prototype pairs, computed once")
     run(sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v")
     checks.append("15 unit tests")
@@ -67,7 +67,7 @@ def main():
     expected_benchmark = pd.read_csv(RESULTS / "retrieval_benchmark.csv")
     expected_frontier = pd.read_csv(RESULTS / "retrieval_frontier.csv")
 
-    run(sys.executable, "run_all_traces.py", "--only", "static,horizon",
+    run(sys.executable, "-m", "experiments.run_all_traces", "--only", "static,horizon",
         "--workers", "4")
     pd.testing.assert_frame_equal(pd.read_csv(RESULTS / "all_static.csv"),
                                   expected_static, check_exact=True)
@@ -81,7 +81,7 @@ def main():
                   (args.metis_python, "metis", "METIS-SENDER"))
     for python, tag, methods in head_parts:
         output_name = f"clean_headtohead_{tag}.csv"
-        run(python, "run_headtohead.py", extra_env={
+        run(python, "-m", "experiments.run_headtohead", extra_env={
             "ALPS_HEADTOHEAD_WORKERS": "2",
             "ALPS_HEADTOHEAD_METHODS": methods,
             "ALPS_HEADTOHEAD_OUTPUT": output_name})
@@ -105,9 +105,9 @@ def main():
     for python, tag, methods in parts:
         bench_name = f"clean_retrieval_{tag}.csv"
         frontier_name = f"clean_frontier_{tag}.csv"
-        run(python, "run_retrieval_benchmark.py", extra_env={
+        run(python, "-m", "experiments.run_retrieval_benchmark", extra_env={
             "ALPS_BENCH_METHODS": methods, "ALPS_BENCH_OUTPUT": bench_name})
-        run(python, "run_retrieval_frontier.py", extra_env={
+        run(python, "-m", "experiments.run_retrieval_frontier", extra_env={
             "ALPS_BENCH_METHODS": methods, "ALPS_FRONTIER_OUTPUT": frontier_name})
         actual_bench = RESULTS / bench_name
         expected_bench = RESULTS / f"clean_retrieval_{tag}_expected.csv"
@@ -123,16 +123,16 @@ def main():
                  frontier_keys, frontier_fields)
     expected_benchmark.to_csv(RESULTS / "retrieval_benchmark.csv", index=False)
     expected_frontier.to_csv(RESULTS / "retrieval_frontier.csv", index=False)
-    run(sys.executable, "plot_retrieval_frontier.py")
-    run(sys.executable, "make_figures.py")
+    run(sys.executable, "-m", "experiments.plot_retrieval_frontier")
+    run(sys.executable, "-m", "experiments.make_figures")
     for name in ("fig_sweep.pdf", "fig_locality.pdf", "fig_retrieval_frontier.pdf"):
         assert (ROOT / "ALPS_conference_submission" / "figures" / name).is_file()
     checks.append("Table V and experimental Figures 2-4: all 1,140 benchmark and 2,604 frontier rows; plots regenerated")
 
-    run(sys.executable, "run_prospective_retrieval.py", "--methods",
+    run(sys.executable, "-m", "experiments.run_prospective_retrieval", "--methods",
         "SENDER-KMEANS-BAL,TXALLO,ALPS", "--repetitions", "1",
         "--output", "clean_full_core")
-    run(args.metis_python, "run_prospective_retrieval.py", "--methods", "METIS-SENDER",
+    run(args.metis_python, "-m", "experiments.run_prospective_retrieval", "--methods", "METIS-SENDER",
         "--repetitions", "1", "--output", "clean_full_metis")
     query_keys = ["trace", "method", "seed", "target_coverage", "category"]
     query_fields = ["cold_token", "contacted_regions", "rows_scanned",
@@ -158,7 +158,7 @@ def main():
 
     for weight, tag in ((.15, "0p15"), (.6, "0p6"), (2.4, "2p4")):
         prefix = "clean_graph_" + tag
-        run(sys.executable, "run_prospective_retrieval.py", "--methods", "ALPS",
+        run(sys.executable, "-m", "experiments.run_prospective_retrieval", "--methods", "ALPS",
             "--graph-weight", str(weight), "--repetitions", "1", "--output", prefix)
         same_csv(RESULTS / f"{prefix}.csv", RESULTS / f"prospective_graph_{tag}.csv",
                  query_keys, query_fields)
@@ -167,7 +167,7 @@ def main():
                  allocation_keys, allocation_fields)
     checks.append("all 36 graph-weight allocations and 2,016 query rows")
 
-    run(sys.executable, "audit_receipts.py", "--offline", "--traces", "bsc", "--limit", "100",
+    run(sys.executable, "-m", "tools.audit_receipts", "--offline", "--traces", "bsc", "--limit", "100",
         "--bsc-rpc", "https://bsc-dataseed.bnbchain.org", "--output", "clean_receipts")
     receipt = json.loads((RESULTS / "clean_receipts_summary.json").read_text())
     assert receipt["sample_fully_resolved"]
@@ -188,7 +188,8 @@ def main():
         "timing_comparison": "excluded",
         "scope": "fresh core venv plus fresh Conda METIS environment; extracted anonymous artifact; local independent rerun, not third-party audit",
     }
-    (ROOT / "CLEAN_REPRODUCTION.json").write_text(json.dumps(report, indent=2) + "\n")
+    (ROOT / "docs" / "CLEAN_REPRODUCTION.json").write_text(
+        json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
 
 

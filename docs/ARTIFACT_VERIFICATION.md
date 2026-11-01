@@ -1,5 +1,9 @@
 # Local artifact verification
 
+> This is a dated verification record. Use
+> [REPRODUCE_CLEAN.md](REPRODUCE_CLEAN.md) and `CLEAN_REPRODUCTION.json` for the
+> current reproducible workflow and result.
+
 Checked on 2026-10-16. This is a local consistency check by the manuscript's
 editing assistant, not independent replication or external certification.
 
@@ -11,11 +15,11 @@ from the retrospective benchmarks, including the unresolved Ethereum audit.
 
 ## Completed checks
 
-- `verify_semantic_scale.py` confirms that static ALPS computes the semantic
+- `tools.verification.verify_semantic_scale` confirms that static ALPS computes the semantic
   scale once from every nonzero sender-to-initial-prototype squared distance,
   rather than from assigned pairs, and does not reassign it during refinement.
   `SEMANTIC_SCALE_VERIFICATION.json` records the executable check.
-- `analyze_prospective_equal_recall.py` regenerates per-configuration,
+- `experiments.analyze_prospective_equal_recall` regenerates per-configuration,
   per-trace, and aggregate matched-recall interpolation from the seven plans
   frozen before suffix evaluation. It also records the explicit assumptions
   and break-even transaction counts for three deployment scenarios.
@@ -55,7 +59,7 @@ from the retrospective benchmarks, including the unresolved Ethereum audit.
 
 ## Archive
 
-Run `python prepare_anonymous_artifact.py` from this directory to check the
+Run `python -m tools.prepare_anonymous_artifact` from the repository root to check the
 local files and write `../output/submission/ALPS_anonymous_artifact.zip`.
 The archive contains code, data, results, active manuscript figures, anonymous
 TeX and the current PDF. `SHA256SUMS.json` records content hashes for its files;
@@ -67,9 +71,9 @@ its hashes verified after creation. The checker additionally requires `pypdf`.
 ### Additional isolated package checks
 
 The full clean-environment rerun passed on 2026-10-17. A fresh Python 3.13
-virtual environment installed `requirements-core-lock.txt`; a fresh Python 3.12
+virtual environment installed `config/requirements-core-lock.txt`; a fresh Python 3.12
 Conda environment installed the native METIS stack in
-`environment-metis-lock.yml`. From a newly extracted anonymous ZIP, the checker
+`config/environment-metis-lock.yml`. From a newly extracted anonymous ZIP, the checker
 regenerated all 150 static rows, 48 horizon rows, 360 head-to-head rows, 1,140
 retrospective benchmark rows, 2,604 retrieval-frontier rows, 48 prospective
 allocations and 2,688 prospective query rows, and 36 graph-weight allocations
@@ -84,7 +88,7 @@ scikit-learn 1.8.0 run. The new lock files fix that reproducibility gap. This
 finding concerns dependency resolution rather than the supplied recorded
 results; the locked rerun reproduced them exactly.
 
-`verify_packaged_artifact.py` extracts the curated ZIP into a new temporary
+`tools.verification.verify_packaged_artifact` extracts the curated ZIP into a new temporary
 directory, verifies every inventory hash, runs all 15 tests, reconstructs the
 prospective headline table and graph-weight summaries, replays all 100 cached
 C1 receipts, and reruns D1/seed-0 prospective allocation for all four methods.

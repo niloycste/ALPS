@@ -46,25 +46,25 @@ def main():
             checks.append(dict(command=arguments, passed=True))
 
         run(sys.executable, ["-m", "unittest", "discover", "-s", "tests", "-v"])
-        run(sys.executable, ["verify_semantic_scale.py"])
+        run(sys.executable, ["-m", "tools.verification.verify_semantic_scale"])
         original = pd.read_csv(root / "results/prospective_retrieval_headline.csv")
-        run(sys.executable, ["summarize_prospective.py", "--parts", "prospective_core,prospective_metis"])
+        run(sys.executable, ["-m", "experiments.summarize_prospective", "--parts", "prospective_core,prospective_metis"])
         pd.testing.assert_frame_equal(original, pd.read_csv(root / "results/prospective_retrieval_headline.csv"))
         expected_equal = pd.read_csv(root / "results/prospective_equal_recall_summary.csv")
-        run(sys.executable, ["analyze_prospective_equal_recall.py"])
+        run(sys.executable, ["-m", "experiments.analyze_prospective_equal_recall"])
         pd.testing.assert_frame_equal(
             expected_equal,
             pd.read_csv(root / "results/prospective_equal_recall_summary.csv"),
             check_exact=True)
-        run(sys.executable, ["summarize_graph_sensitivity.py"])
-        run(sys.executable, ["audit_receipts.py", "--offline", "--traces", "bsc", "--limit", "100",
+        run(sys.executable, ["-m", "experiments.summarize_graph_sensitivity"])
+        run(sys.executable, ["-m", "tools.audit_receipts", "--offline", "--traces", "bsc", "--limit", "100",
                              "--bsc-rpc", "https://bsc-dataseed.bnbchain.org", "--output", "isolated_receipts"])
         receipt = json.loads((root / "results/isolated_receipts_summary.json").read_text())
         assert receipt["sample_fully_resolved"]
         assert receipt["traces"][0]["classifications"] == {"success_matching_transfer": 100}
         for python, methods, output in ((sys.executable, "ALPS,SENDER-KMEANS-BAL,TXALLO", "isolated_core"),
                                         (args.metis_python, "METIS-SENDER", "isolated_metis")):
-            run(python, ["run_prospective_retrieval.py", "--methods", methods, "--traces", "eth_aug14",
+            run(python, ["-m", "experiments.run_prospective_retrieval", "--methods", methods, "--traces", "eth_aug14",
                          "--seeds", "0", "--repetitions", "1", "--output", output])
             fresh = pd.read_csv(root / "results" / (output + ".csv"))
             baseline = pd.read_csv(root / "results/prospective_retrieval.csv")

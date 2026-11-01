@@ -6,7 +6,7 @@ construction inside METIS-SENDER and TXALLO.  Every measurement runs in a
 fresh process, sequentially, to avoid CPU contention and stale peak-memory
 counters.
 
-    python -B run_allocator_comparison.py
+    python -m experiments.run_allocator_comparison
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ os.environ.setdefault("LOKY_MAX_CPU_COUNT", "8")
 from sim.native import NativeWorkload
 from sim.partition import STRATEGIES, cross_region_ratio, load_balance, semantic_locality
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 N_REGIONS = 6
 SEEDS = (0, 1, 2, 3, 4)

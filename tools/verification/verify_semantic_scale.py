@@ -2,7 +2,7 @@
 
 The check distinguishes the implemented definition from two plausible errors:
 using only assigned sender/prototype distances, or recomputing the median during
-refinement. It writes SEMANTIC_SCALE_VERIFICATION.json.
+refinement. It writes docs/SEMANTIC_SCALE_VERIFICATION.json.
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ import sim.partition as partition
 from sim.chain import Transaction
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def transaction(tid, sender, receiver, nonce, category, feature):
@@ -108,7 +108,7 @@ def main():
             "squared distances exactly once and reuses that fixed scalar."
         ),
     }
-    output = ROOT / "SEMANTIC_SCALE_VERIFICATION.json"
+    output = ROOT / "docs" / "SEMANTIC_SCALE_VERIFICATION.json"
     output.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
 

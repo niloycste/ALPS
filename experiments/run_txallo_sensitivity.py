@@ -6,7 +6,7 @@ two.  It evaluates the paper's six-region headline on every direct-call trace
 and three seeds.  Only allocation metrics are measured; this is not a TxAllo
 protocol or throughput benchmark.
 
-    python -B run_txallo_sensitivity.py
+    python -m experiments.run_txallo_sensitivity
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ from sim.partition import (
 )
 from sim.txallo import txallo
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 HEADTOHEAD = os.path.join(RESULTS, "headtohead.csv")
 REGIONS = (6,)

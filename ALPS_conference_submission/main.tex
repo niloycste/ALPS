@@ -579,8 +579,9 @@ after the barrier.
 The full static sweep uses deterministic seed 0 and $k$-means
 \texttt{n\_init=10}. The temporal, frontier, ablation, and TxAllo comparisons
 use three initialisations. We base allocation-sensitive conclusions on these
-sensitivity runs as well as on the exact static audit. The capacity and
-allocator-runtime audits use five fresh initialisations.
+sensitivity runs as well as on the exact static audit. The D1 prefix-scaling
+audit uses three seeds; the capacity audit and separate cross-method
+allocator-runtime comparison each use five fresh initialisations.
 
 For the balance-safety experiment, we give each observed (account, token)
 key the same starting balance. We test seven values:
@@ -631,10 +632,11 @@ out-of-sample allocator fitting. After warm-up, 250 repetitions per token record
 contacted regions, examined rows, result recall, median latency, and latency
 interquartile range. This benchmark measures allocation-related scan work. It does not model an
 index, network delay, or a distributed storage engine. History-90 excludes
-tokens that do not appear in the history: there are none on D1--D3, and C1's
-BUSD token has one suffix call. Each method and seed therefore covers
-eight/eight/eight/seven token categories. There are no categories that appear
-only in the history.
+tokens absent from the history: none on D1--D3, but C1's BUSD category appears
+only in the suffix, with one call. Each method and seed therefore covers
+eight/eight/eight/seven token categories. No category appears only in the
+history. The prospective experiment includes this unseen C1 token and scans
+all regions for its query.
 
 \paragraph{Prospective Allocation and Queries}
 \label{sec:prospective_protocol}
@@ -667,9 +669,10 @@ $45.7\%$ for C1. This conditional metric matches ALPS's active-sender graph
 while keeping the denominator explicit.
 
 The fixed-horizon replay uses $n=6$, history fractions
-$\{0.5,0.6,0.7,0.8\}$, and three $k$-means initialisations. This gives 12
-history/future configurations for each method. The figures show the mean and
-standard deviation across these configurations. They are sensitivity summaries,
+$\{0.5,0.6,0.7,0.8\}$, and three $k$-means initialisations. For each trace
+and method, these give 12 history/future configurations, or 48 across the four
+traces. The figures show the mean and standard deviation across configurations
+within each trace. They are sensitivity summaries,
 not independent samples from the chains. Across the four traces, 60.0\% of
 future transactions come from senders that are not in the training prefix.
 This makes the treatment of new senders important. At a history fraction of
@@ -685,8 +688,10 @@ The main parameters are $\lambda_g=0.15$ and $\alpha=1.15$. We select them
 using D1 as the development trace and then keep them fixed. D2, D3, and C1
 provide checks on temporally separate traces. However, each static allocation
 is fitted and evaluated on the same trace, so these tests are not out-of-sample
-allocation tests. The static and head-to-head evaluations use all six region
-counts. The stress, temporal, and mechanism analyses use $n=6$. The operating
+allocation tests. The static sweep and head-to-head runs cover all six region
+counts. We report the METIS comparison over all 24 trace/region settings and
+the TxAllo comparison at $n\in\{6,11\}$ (eight settings); Table~\ref{tab:headtohead}
+shows these two counts. The stress, temporal, and mechanism analyses use $n=6$. The operating
 frontier varies only $\lambda_g$, and each ablation removes one component.
 The static sweep contains 120 trace/region/scheme measurements. The
 balance-stress experiment contains 175 measurements: 140 sender-local and
@@ -1034,9 +1039,10 @@ higher. S-KM-BAL contacts 8.6\% fewer regions than ALPS, but ALPS scans
 15.1\% fewer rows and has 7.8 percentage points higher recall.
 
 A complete query scans all six regions and returns every match. Its mean
-per-token median latency is 7.93--8.87~$\mu$s. History-90 reports the median
-and interquartile range over 250 in-memory repetitions; these timings establish
-neither distributed nor equal-recall latency gains.
+per-token median latency is 7.93--8.87~$\mu$s in the retrospective in-memory
+benchmark of Table~\ref{tab:retrieval}. History-90 reports the median and
+interquartile range over 250 repetitions in that same benchmark. These timings
+establish neither distributed nor equal-recall latency gains.
 
 Figure~\ref{fig:retrieval_frontier} shows the trade-off between recall and
 scan work for the preset training coverage targets
@@ -1113,9 +1119,11 @@ cold-token controls return all matches. The causal interaction coverage is
 .097) and a higher maximum-to-mean load (1.534 versus 1.191).
 
 ALPS therefore favours retrieval at the expense of interaction locality and
-load. Chronological placement has no lifetime load cap. Because local timings
-used different Python environments and overlapping runs, we compare scan work
-rather than latency.
+load. Chronological placement has no lifetime load cap. The prospective
+holdout's local query timings used different Python environments and overlapping
+runs, so we compare its scan work rather than its latency. This limitation is
+specific to the prospective holdout, not the retrospective timings in
+Table~\ref{tab:retrieval}.
 
 \begin{table}[t]
 \caption{Prospective allocation and queries: 70/30 holdout, six regions, three

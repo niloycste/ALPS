@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 d = pd.read_csv(ROOT / "results/retrieval_frontier.csv")
 keys = ["method", "target_coverage"]
 # Match Table V: each eligible token/seed contributes equally.

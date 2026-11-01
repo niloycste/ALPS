@@ -4,7 +4,7 @@ Runs the six-region headline on every direct-call trace.  Raw outputs retain
 each initialization; the summary reports means, sample standard deviations,
 and 95% t-interval half-widths over allocator initializations.
 
-    python -B run_alpha_sensitivity.py
+    python -m experiments.run_alpha_sensitivity
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ os.environ.setdefault("LOKY_MAX_CPU_COUNT", "8")
 from sim.native import NativeWorkload
 from sim.partition import alps, cross_region_ratio, load_balance, semantic_locality
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 N_REGIONS = 6
 ALPHAS = (1.05, 1.10, 1.15, 1.25, 1.50)

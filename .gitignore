@@ -1,11 +1,15 @@
 # Python artifacts
 __pycache__/
 *.py[cod]
+.venv*/
+.conda-metis/
 
 # Local experiment and manuscript QA scratch files
 tmp/
 ALPS_conference_submission/tmp/
 ALPS_conference_submission/_qa*/
+results/clean_*
+results/*_smoke*
 
 # LaTeX build intermediates (keep the reviewed PDFs)
 *.aux

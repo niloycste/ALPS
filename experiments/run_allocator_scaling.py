@@ -5,7 +5,7 @@ construction and ALPS allocation are timed separately.  Peak working set is
 the process-wide Windows peak and therefore includes the loaded trace and
 Python runtime, making it a conservative deployment figure.
 
-    python -B run_allocator_scaling.py
+    python -m experiments.run_allocator_scaling
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ os.environ.setdefault("LOKY_MAX_CPU_COUNT", "8")
 from sim.native import NativeWorkload
 from sim.partition import alps
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TRACE = os.path.join(HERE, "data", "native_all.csv")
 RESULTS = os.path.join(HERE, "results")
 SIZES = (5_000, 10_000, 20_000, 34_326)

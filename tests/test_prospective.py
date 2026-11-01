@@ -9,8 +9,8 @@ import unittest
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from run_prospective_retrieval import PrefixEncoder, frozen_plans, query_benchmark, route_future
-from audit_receipts import TRANSFER_TOPIC, RPC, NotAttempted, classify, validate_transaction
+from experiments.run_prospective_retrieval import PrefixEncoder, frozen_plans, query_benchmark, route_future
+from tools.audit_receipts import TRANSFER_TOPIC, RPC, NotAttempted, classify, validate_transaction
 
 
 def row(sender="0x" + "1" * 40, recipient="0x" + "2" * 40, token="0x" + "3" * 40, value="10", nonce="0"):

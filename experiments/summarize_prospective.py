@@ -1,6 +1,6 @@
 """Combine optional split runs and summarise measured prospective retrieval.
 
-python summarize_prospective.py --parts prospective_core,prospective_metis
+python -m experiments.summarize_prospective --parts prospective_core,prospective_metis
 """
 import argparse
 from pathlib import Path
@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():

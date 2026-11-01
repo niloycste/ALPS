@@ -15,8 +15,8 @@ traces, so each dataset receives the same treatment the primary one did:
 Dataset spans are evaluated in parallel processes; disjoint held-out spans are
 not treated as statistically independent replications.
 
-    python run_all_traces.py --workers 4
-    python run_all_traces.py --only static,headroom
+    python -m experiments.run_all_traces --workers 4
+    python -m experiments.run_all_traces --only static,headroom
 """
 
 from __future__ import annotations
@@ -33,9 +33,9 @@ os.environ.setdefault("LOKY_MAX_CPU_COUNT", "8")
 from sim.native import NativeWorkload
 from sim.ethereum import EthereumWorkload
 
-import run_final as R
+from experiments import run_final as R
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 
 # Direct-call traces carry real signer nonces and support every experiment.

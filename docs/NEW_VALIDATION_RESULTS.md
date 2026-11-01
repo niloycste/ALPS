@@ -7,7 +7,7 @@ and detailed per-trace outputs remain in the artifact.
 
 ## Prospective allocation and queries
 
-`run_prospective_retrieval.py` was run on all four frozen traces with allocation
+`experiments.run_prospective_retrieval` was run on all four frozen traces with allocation
 seeds 0, 1, 2, six regions, seven preset query coverage targets and 250 timing
 repetitions. It produced 48 allocation configurations and 2,688 token-level
 query measurements. The original datasets and existing result files are unchanged.
@@ -104,14 +104,14 @@ results, configurations and per-trace aggregates are in `prospective_graph_*`.
 $env:OMP_NUM_THREADS='1'
 $env:OPENBLAS_NUM_THREADS='1'
 foreach ($weight in @('0.15','0.6','2.4')) {
-  python -B run_prospective_retrieval.py --methods ALPS --graph-weight $weight --repetitions 1 --output ('prospective_graph_' + $weight.Replace('.','p'))
+  python -m experiments.run_prospective_retrieval --methods ALPS --graph-weight $weight --repetitions 1 --output ('prospective_graph_' + $weight.Replace('.','p'))
 }
-python -B summarize_graph_sensitivity.py
+python -m experiments.summarize_graph_sensitivity
 ```
 
 ## Receipt audit: original attempt
 
-`audit_receipts.py` samples 100 records uniformly without replacement per trace,
+`tools.audit_receipts` samples 100 records uniformly without replacement per trace,
 using seed 0. It verifies receipt transaction hash, block and index, status,
 and exact Transfer contract/sender/recipient/raw-amount matches. For D1, which
 lacks transaction hashes, it first attempts recovery by block and transaction
@@ -145,7 +145,7 @@ responses are never classified as reverted calls.
 
 ### Completed Ethereum retry
 
-`retry_ethereum_audit.py --endpoint https://eth.llamarpc.com --timeout 5`
+`python -m tools.retry_ethereum_audit --endpoint https://eth.llamarpc.com --timeout 5`
 attempted all 100 original seed-0 records on each Ethereum trace, with two
 attempts per RPC and no circuit breaker. Each record requests the reported
 block/index transaction and checks its hash, sender, token, nonce and calldata
@@ -164,13 +164,13 @@ block and receipt outcomes and errors. This completes the bounded attempt of
 the intended sample, **not** Ethereum receipt validation. An accessible
 historical provider is still required to resolve it.
 
-From `paper/`, in an environment with `requirements-metis.txt` installed:
+From the repository root, in an environment with `config/requirements-metis.txt` installed:
 
 ```bash
-python -B run_prospective_retrieval.py
-python -B summarize_prospective.py
-python -B audit_receipts.py --limit 100 --ethereum-rpc https://rpc.flashbots.net --bsc-rpc https://bsc-dataseed.bnbchain.org
-python -B audit_receipts.py --offline --traces bsc --limit 100 --bsc-rpc https://bsc-dataseed.bnbchain.org --output receipt_bsc_confirmed
+python -m experiments.run_prospective_retrieval
+python -m experiments.summarize_prospective
+python -m tools.audit_receipts --limit 100 --ethereum-rpc https://rpc.flashbots.net --bsc-rpc https://bsc-dataseed.bnbchain.org
+python -m tools.audit_receipts --offline --traces bsc --limit 100 --bsc-rpc https://bsc-dataseed.bnbchain.org --output receipt_bsc_confirmed
 python -B -m unittest discover -s tests -v
 ```
 
@@ -179,9 +179,9 @@ METIS used the existing Python 3.12/PyMetis environment. Both were launched with
 `OMP_NUM_THREADS=1` and `OPENBLAS_NUM_THREADS=1`:
 
 ```bash
-python -B run_prospective_retrieval.py --methods SENDER-KMEANS-BAL,TXALLO,ALPS --output prospective_core
-python -B run_prospective_retrieval.py --methods METIS-SENDER --output prospective_metis
-python -B summarize_prospective.py --parts prospective_core,prospective_metis
+python -m experiments.run_prospective_retrieval --methods SENDER-KMEANS-BAL,TXALLO,ALPS --output prospective_core
+python -m experiments.run_prospective_retrieval --methods METIS-SENDER --output prospective_metis
+python -m experiments.summarize_prospective --parts prospective_core,prospective_metis
 ```
 
 All 15 existing and new unit tests passed, including graph-weight sensitivity

@@ -13,7 +13,7 @@ import numpy as np
 from sim.native import NativeWorkload
 from sim.partition import STRATEGIES
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 TRACES = {"eth_aug14": "data/native_all.csv", "eth_aug13": "data/native_day2.csv",
           "eth_aug07": "data/eth_week2.csv", "bsc": "data/bsc_trace.csv"}

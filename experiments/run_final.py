@@ -40,7 +40,7 @@ from sim.partition import (
 from sim.experiment import run_parallel, run_sequential
 from sim.chain import fully_funded_state
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 BLOCK = 250
 SCHEMES = [
@@ -413,4 +413,4 @@ if __name__ == "__main__":
     write("final_online.csv", temporal(NATIVE))
     write("final_temporal_sensitivity.csv", temporal_sensitivity(NATIVE))
     write("final_alps_analysis.csv", alps_analysis(NATIVE))
-    print("\ndone -- run make_figures.py next")
+    print("\ndone -- run python -m experiments.make_figures next")

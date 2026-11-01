@@ -21,7 +21,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(HERE, "results")
 FIGS = os.path.join(HERE, "ALPS_conference_submission", "figures")
 os.makedirs(FIGS, exist_ok=True)
